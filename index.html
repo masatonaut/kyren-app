@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kyren</title>
+  <meta name="description" content="Micro-SaaS studio. Focused tools for everyday life.">
+  <meta property="og:title" content="Kyren">
+  <meta property="og:description" content="Focused tools for everyday life. Built in Tokyo.">
+  <meta property="og:url" content="https://kyren.app">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Söhne,ui-sans-serif,system-ui,sans-serif&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0b0b;
+      --text: #999;
+      --text-bright: #e8e8e8;
+      --text-dim: #555;
+      --accent: #e8e8e8;
+      --link: #e8e8e8;
+      --border: #1a1a1a;
+      --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { font-size: 17px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-weight: 400;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    .page {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+    /* -- Header -- */
+    header {
+      padding: 4rem 0 0;
+      margin-bottom: 8rem;
+    }
+    .wordmark {
+      font-family: var(--sans);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    /* -- Intro -- */
+    .intro {
+      margin-bottom: 8rem;
+    }
+    .intro h1 {
+      font-family: var(--serif);
+      font-weight: 300;
+      font-size: 2rem;
+      line-height: 1.4;
+      color: var(--text-bright);
+      margin-bottom: 2rem;
+      letter-spacing: -0.01em;
+      max-width: 520px;
+    }
+    .intro p {
+      font-size: 0.95rem;
+      color: var(--text);
+      max-width: 440px;
+      line-height: 1.7;
+    }
+    /* -- Products -- */
+    .products {
+      margin-bottom: 8rem;
+    }
+    .products-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 2rem;
+    }
+    .product-item {
+      display: block;
+      padding: 1.2rem 0;
+      border-top: 1px solid var(--border);
+      text-decoration: none;
+      color: inherit;
+      transition: padding-left 0.2s ease;
+    }
+    .product-item:last-child {
+      border-bottom: 1px solid var(--border);
+    }
+    .product-item:hover {
+      padding-left: 0.5rem;
+    }
+    .product-item:hover .product-item__name {
+      color: var(--text-bright);
+    }
+    .product-item__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+    .product-item__name {
+      font-family: var(--sans);
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--text);
+      transition: color 0.2s;
+    }
+    .product-item__meta {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .product-item__desc {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      margin-top: 0.25rem;
+    }
+    .live-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: #22c55e;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    /* -- About -- */
+    .about {
+      margin-bottom: 8rem;
+    }
+    .about p {
+      font-family: var(--serif);
+      font-size: 1.15rem;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--text);
+      line-height: 1.7;
+      max-width: 500px;
+    }
+    /* -- Footer -- */
+    footer {
+      padding: 3rem 0;
+      border-top: 1px solid var(--border);
+    }
+    .footer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+    .footer-copy {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      opacity: 0.6;
+    }
+    .footer-legal {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .footer-legal summary {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      list-style: none;
+    }
+    .footer-legal summary::-webkit-details-marker { display: none; }
+    .footer-legal summary::before {
+      content: '+ ';
+      color: var(--text-dim);
+    }
+    .footer-legal[open] summary::before { content: '− '; }
+    .footer-legal-content {
+      margin-top: 1.5rem;
+    }
+    .footer-legal-content h4 {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin: 1.5rem 0 0.5rem;
+    }
+    .footer-legal-content h4:first-child { margin-top: 0; }
+    .footer-legal-content p {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      opacity: 0.8;
+    }
+    /* -- Responsive -- */
+    @media (max-width: 480px) {
+      header { margin-bottom: 5rem; }
+      .intro, .products, .about { margin-bottom: 5rem; }
+      .intro h1 { font-size: 1.7rem; }
+      .product-item__row { flex-direction: column; gap: 0.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="wordmark">Kyren</div>
+    </header>
+    <section class="intro">
+      <h1>A small studio building focused tools for everyday life.</h1>
+      <p>Each product solves one problem well. Nothing more, nothing less. Built in Tokyo with care.</p>
+    </section>
+    <section class="products">
+      <div class="products-label">Products</div>
+      <a href="https://kashite-amber.vercel.app" class="product-item" target="_blank">
+        <div class="product-item__row">
+          <span class="product-item__name">KASHITE</span>
+          <span class="product-item__meta"><span class="live-dot"></span>Live</span>
+        </div>
+        <div class="product-item__desc">Track who borrowed what. Get it back.</div>
+      </a>
+      <div class="product-item">
+        <div class="product-item__row">
+          <span class="product-item__name">ToneShift</span>
+          <span class="product-item__meta">Coming soon</span>
+        </div>
+        <div class="product-item__desc">Rewrite any text in a different tone.</div>
+      </div>
+      <div class="product-item">
+        <div class="product-item__row">
+          <span class="product-item__name">ChoiDash</span>
+          <span class="product-item__meta">Coming soon</span>
+        </div>
+        <div class="product-item__desc">A new-tab dashboard for context switching.</div>
+      </div>
+      <div class="product-item">
+        <div class="product-item__row">
+          <span class="product-item__name">RecMe</span>
+          <span class="product-item__meta">Coming soon</span>
+        </div>
+        <div class="product-item__desc">Save and share recommendations from friends.</div>
+      </div>
+      <div class="product-item">
+        <div class="product-item__row">
+          <span class="product-item__name">FitKeep</span>
+          <span class="product-item__meta">Coming soon</span>
+        </div>
+        <div class="product-item__desc">Catalog your closet. Plan outfits. Track what you wear.</div>
+      </div>
+      <div class="product-item">
+        <div class="product-item__row">
+          <span class="product-item__name">ShipLog</span>
+          <span class="product-item__meta">Coming soon</span>
+        </div>
+        <div class="product-item__desc">A build-in-public journal for makers.</div>
+      </div>
+    </section>
+    <section class="about">
+      <p>Kyren is one engineer, building from Tokyo, heading to Los Angeles. Every tool follows Kanso — the Japanese principle of simplicity. Strip away the unnecessary. Leave only what matters.</p>
+    </section>
+    <footer>
+      <div class="footer-top">
+        <span class="footer-copy">© 2026 Kyren</span>
+        <div class="footer-links">
+          <a href="https://instagram.com/kyren.app" target="_blank">Instagram</a>
+          <a href="https://x.com/" target="_blank">X</a>
+          <a href="https://github.com/masatonaut" target="_blank">GitHub</a>
+          <a href="mailto:hello@kyren.app">Contact</a>
+        </div>
+      </div>
+      <details class="footer-legal">
+        <summary>Legal & Policies</summary>
+        <div class="footer-legal-content">
+          <h4>Refund Policy</h4>
+          <p>Full refund within 14 days of purchase. Refunds processed within 5–10 business days to the original payment method.</p>
+          <h4>Cancellation</h4>
+          <p>Cancel anytime from account settings. Access continues until end of billing period.</p>
+          <h4>Privacy</h4>
+          <p>Minimum necessary data collected. Email for auth, basic usage data for improvement. No selling or sharing personal information.</p>
+          <h4>Terms</h4>
+          <p>Products provided "as is." Use lawfully. Terms may update with notice.</p>
+          <h4>特定商取引法に基づく表記</h4>
+          <p>Seller: Kyren (個人事業) / Tokyo, Japan / hello@kyren.app / Payment: Stripe / Delivery: Immediate access / Returns: 14-day refund policy.</p>
+        </div>
+      </details>
+    </footer>
+  </div>
+</body>
+</html>
