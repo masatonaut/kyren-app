@@ -174,43 +174,22 @@
       color: var(--text-dim);
       opacity: 0.6;
     }
-    .footer-legal {
-      margin-top: 2rem;
+    .footer-legal-links {
+      margin-top: 1.5rem;
       padding-top: 1.5rem;
       border-top: 1px solid var(--border);
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
     }
-    .footer-legal summary {
+    .footer-legal-links a {
       font-size: 0.7rem;
       color: var(--text-dim);
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      list-style: none;
+      text-decoration: none;
+      transition: color 0.2s;
+      letter-spacing: 0.02em;
     }
-    .footer-legal summary::-webkit-details-marker { display: none; }
-    .footer-legal summary::before {
-      content: '+ ';
-      color: var(--text-dim);
-    }
-    .footer-legal[open] summary::before { content: '− '; }
-    .footer-legal-content {
-      margin-top: 1.5rem;
-    }
-    .footer-legal-content h4 {
-      font-size: 0.65rem;
-      font-weight: 500;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin: 1.5rem 0 0.5rem;
-    }
-    .footer-legal-content h4:first-child { margin-top: 0; }
-    .footer-legal-content p {
-      font-size: 0.75rem;
-      color: var(--text-dim);
-      line-height: 1.7;
-      opacity: 0.8;
-    }
+    .footer-legal-links a:hover { color: var(--text); }
     /* -- Responsive -- */
     @media (max-width: 480px) {
       header { margin-bottom: 5rem; }
@@ -272,28 +251,18 @@
     </section>
     <footer>
       <div class="footer-top">
-        <span class="footer-copy">© 2026 Kyren</span>
+        <span class="footer-copy">&copy; 2026 Kyren</span>
         <div class="footer-links">
           <a href="https://x.com/masatobuilds" target="_blank">X</a>
           <a href="https://github.com/masatonaut" target="_blank">GitHub</a>
           <a href="mailto:hey@kyren.app">Contact</a>
         </div>
       </div>
-      <details class="footer-legal">
-        <summary>Legal & Policies</summary>
-        <div class="footer-legal-content">
-          <h4>Refund Policy</h4>
-          <p>Full refund within 14 days of purchase. Refunds processed within 5–10 business days to the original payment method.</p>
-          <h4>Cancellation</h4>
-          <p>Cancel anytime from account settings. Access continues until end of billing period.</p>
-          <h4>Privacy</h4>
-          <p>Minimum necessary data collected. Email for auth, basic usage data for improvement. No selling or sharing personal information.</p>
-          <h4>Terms</h4>
-          <p>Products provided "as is." Use lawfully. Terms may update with notice.</p>
-          <h4>特定商取引法に基づく表記</h4>
-          <p>Seller: Kyren (個人事業) / Tokyo, Japan / hey@kyren.app / Payment: Stripe / Delivery: Immediate access / Returns: 14-day refund policy.</p>
-        </div>
-      </details>
+      <div class="footer-legal-links">
+        <a href="/terms">利用規約</a>
+        <a href="/privacy">プライバシーポリシー</a>
+        <a href="/tokushoho">特定商取引法に基づく表記</a>
+      </div>
     </footer>
   </div>
 </body>
