@@ -42,6 +42,14 @@ const styleGuide: Record<StyleKey, string> = {
 
 export async function POST(request: Request) {
   try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error("ANTHROPIC_API_KEY is not set");
+      return NextResponse.json(
+        { error: "API key not configured" },
+        { status: 500 }
+      );
+    }
+
     const { text, targetStyle } = await request.json();
 
     if (!text || typeof text !== "string") {
@@ -79,12 +87,35 @@ ${text}`;
       throw new Error("Unexpected response type");
     }
 
-    // Parse JSON response
-    const result = JSON.parse(content.text);
+    // Parse JSON response — strip markdown fences if present
+    const raw = content.text.trim();
+    const jsonStr = raw.startsWith("```")
+      ? raw.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "")
+      : raw;
+
+    let result;
+    try {
+      result = JSON.parse(jsonStr);
+    } catch (parseError) {
+      console.error("JSON parse error. Raw response:", raw);
+      return NextResponse.json(
+        { error: "Failed to parse AI response" },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json(result);
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Rewrite error:", error);
+
+    // Forward Anthropic API errors with details
+    if (error instanceof Anthropic.APIError) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: error.status || 502 }
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to rewrite text" },
       { status: 500 }
