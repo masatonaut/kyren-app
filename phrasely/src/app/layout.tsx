@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "Phrasely - Sound native, effortlessly",
+  title: "Phrasely — Sound native, effortlessly",
   description:
-    "AI-powered English rewriting tool for non-native speakers. Transform your writing to sound more natural while learning why changes were made.",
+    "AI-powered English rewriting for Japanese speakers. Transform your writing to sound more natural while learning why changes were made.",
+  openGraph: {
+    title: "Phrasely — Sound native, effortlessly",
+    description: "AI-powered English rewriting for Japanese speakers.",
+    type: "website",
+    url: "https://phrasely.kyren.app",
+  },
 };
 
 export default function RootLayout({
@@ -14,7 +21,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <Header />
+        {children}
+      </body>
     </html>
   );
 }
