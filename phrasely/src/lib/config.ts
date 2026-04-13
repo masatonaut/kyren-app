@@ -1,0 +1,13 @@
+export const LIMITS = {
+  FREE_DAILY_REWRITES: 3,
+  FREE_MAX_CHARS: 500,
+  PRO_MAX_CHARS: 2000,
+  RATE_LIMIT_PER_MINUTE: 5,
+  RATE_LIMIT_PER_HOUR: 30,
+} as const;
+
+export const PRICING = {
+  PRO_MONTHLY: 4.99,
+  PRO_ANNUAL_MONTHLY: 3.99,
+  PRO_ANNUAL_TOTAL: 47.88,
+} as const;

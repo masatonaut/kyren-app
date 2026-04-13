@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { LIMITS, PRICING } from "@/lib/config";
 
 interface Change {
   original: string;
@@ -12,62 +13,23 @@ interface Change {
 interface RewriteResult {
   rewritten: string;
   changes: Change[];
+  usage?: {
+    used: number;
+    limit: number;
+    remaining: number;
+  };
 }
-
-// Free tier usage tracking
-const FREE_LIMIT = 5;
-const STORAGE_KEY = "phrasely_usage";
-
-interface UsageData {
-  count: number;
-  resetDate: string; // YYYY-MM format
-}
-
-const getUsage = (): UsageData => {
-  if (typeof window === "undefined") {
-    return { count: 0, resetDate: "" };
-  }
-  const stored = localStorage.getItem(STORAGE_KEY);
-  const currentMonth = new Date().toISOString().slice(0, 7);
-
-  if (!stored) {
-    return { count: 0, resetDate: currentMonth };
-  }
-
-  const data: UsageData = JSON.parse(stored);
-  if (data.resetDate !== currentMonth) {
-    // New month, reset count
-    return { count: 0, resetDate: currentMonth };
-  }
-  return data;
-};
-
-const incrementUsage = () => {
-  const usage = getUsage();
-  usage.count += 1;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(usage));
-};
-
-const canRewrite = (): boolean => {
-  const usage = getUsage();
-  return usage.count < FREE_LIMIT;
-};
-
-const getRemainingRewrites = (): number => {
-  const usage = getUsage();
-  return Math.max(0, FREE_LIMIT - usage.count);
-};
 
 // Limit Modal Component
 const LimitModal = ({ onClose }: { onClose: () => void }) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-[var(--card)] p-6 rounded-xl max-w-md mx-4 border border-[var(--border)]">
       <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">
-        Free limit reached
+        Daily limit reached
       </h3>
       <p className="text-[var(--muted)] mb-4">
-        You&apos;ve used all 5 free rewrites this month. Join the waitlist for
-        Pro access with unlimited rewrites.
+        You&apos;ve used all {LIMITS.FREE_DAILY_REWRITES} free rewrites for
+        today. Upgrade to Pro for unlimited rewrites.
       </p>
       <div className="flex gap-3">
         <button
@@ -77,11 +39,11 @@ const LimitModal = ({ onClose }: { onClose: () => void }) => (
           Close
         </button>
         <a
-          href="#waitlist"
+          href="#pricing"
           onClick={onClose}
           className="px-4 py-2 rounded-lg bg-[var(--accent)] text-white font-medium hover:bg-[var(--accent)]/90 transition"
         >
-          Join Waitlist
+          Upgrade to Pro
         </a>
       </div>
     </div>
@@ -90,11 +52,11 @@ const LimitModal = ({ onClose }: { onClose: () => void }) => (
 
 // Style options with icons
 const STYLE_OPTIONS = [
-  { value: "casual", label: "Casual", icon: "💬" },
-  { value: "formal", label: "Formal", icon: "🏢" },
-  { value: "academic", label: "Academic", icon: "🎓" },
-  { value: "business_email", label: "Business Email", icon: "💼" },
-  { value: "social", label: "Social", icon: "🍷" },
+  { value: "casual", label: "Casual", icon: "\u{1F4AC}" },
+  { value: "formal", label: "Formal", icon: "\u{1F3E2}" },
+  { value: "academic", label: "Academic", icon: "\u{1F393}" },
+  { value: "business_email", label: "Business Email", icon: "\u{1F4BC}" },
+  { value: "social", label: "Social", icon: "\u{1F377}" },
 ] as const;
 
 type StyleValue = (typeof STYLE_OPTIONS)[number]["value"];
@@ -110,10 +72,37 @@ const speak = (text: string) => {
   }
 };
 
+// Render text with editable fill-in markers (___)
+const RewrittenText = ({ text }: { text: string }) => {
+  const parts = text.split(/(_{3,})/);
+  if (parts.length === 1) {
+    return <p className="text-[var(--foreground)]">{text}</p>;
+  }
+  return (
+    <p className="text-[var(--foreground)]">
+      {parts.map((part, i) =>
+        /^_{3,}$/.test(part) ? (
+          <span
+            key={i}
+            contentEditable
+            suppressContentEditableWarning
+            className="inline-block px-2 py-0.5 mx-0.5 rounded bg-amber-500/20 text-amber-300 border border-dashed border-amber-500/50 outline-none focus:border-amber-500 focus:bg-amber-500/30 min-w-[60px] text-center cursor-text"
+            title="Click to fill in"
+          >
+            ___
+          </span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </p>
+  );
+};
+
 // Typewriter demo data
 const TYPEWRITER_DEMO = {
   input: "I want to go to the cafe",
-  output: "I'm craving a good latte — wanna grab one?",
+  output: "I\u2019m craving a good latte \u2014 wanna grab one?",
 };
 
 export default function Home() {
@@ -125,7 +114,9 @@ export default function Home() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [remainingRewrites, setRemainingRewrites] = useState(FREE_LIMIT);
+  const [remainingRewrites, setRemainingRewrites] = useState(
+    LIMITS.FREE_DAILY_REWRITES
+  );
   const [targetStyle, setTargetStyle] = useState<StyleValue>("casual");
   const [showJapanese, setShowJapanese] = useState(false);
 
@@ -136,9 +127,16 @@ export default function Home() {
     "typing-input" | "pause" | "typing-output" | "done"
   >("typing-input");
 
-  // Update remaining rewrites on mount and after each rewrite
+  // Fetch remaining rewrites from server on mount
   useEffect(() => {
-    setRemainingRewrites(getRemainingRewrites());
+    fetch("/api/usage")
+      .then((r) => r.json())
+      .then((data) => {
+        if (typeof data.remaining === "number") {
+          setRemainingRewrites(data.remaining);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Typewriter effect
@@ -204,14 +202,14 @@ export default function Home() {
         setSubmitted(true);
       }
     } catch {
-      setSubmitted(true); // Fallback for demo
+      setSubmitted(true);
     }
   };
 
   const handleRewrite = async () => {
     if (!inputText.trim()) return;
 
-    if (!canRewrite()) {
+    if (remainingRewrites <= 0) {
       setShowLimitModal(true);
       return;
     }
@@ -227,14 +225,27 @@ export default function Home() {
         body: JSON.stringify({ text: inputText, targetStyle }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        throw new Error("Rewrite failed");
+        if (res.status === 429) {
+          if (data.usage) {
+            setRemainingRewrites(data.usage.remaining);
+          }
+          if (data.error?.includes("Daily")) {
+            setShowLimitModal(true);
+          } else {
+            setError(data.error || "Too many requests. Please wait.");
+          }
+          return;
+        }
+        throw new Error(data.error || "Rewrite failed");
       }
 
-      const data = await res.json();
       setResult(data);
-      incrementUsage();
-      setRemainingRewrites(getRemainingRewrites());
+      if (data.usage) {
+        setRemainingRewrites(data.usage.remaining);
+      }
     } catch {
       setError("Failed to rewrite. Please try again.");
     } finally {
@@ -261,11 +272,12 @@ export default function Home() {
           Sound native, effortlessly.
         </p>
         <p className="text-sm md:text-base text-[var(--muted)] mb-4">
-          日本語の感覚を残したまま、ネイティブに伝わる英語に。
+          {"\u65E5\u672C\u8A9E\u306E\u611F\u899A\u3092\u6B8B\u3057\u305F\u307E\u307E\u3001\u30CD\u30A4\u30C6\u30A3\u30D6\u306B\u4F1D\u308F\u308B\u82F1\u8A9E\u306B\u3002"}
         </p>
         <p className="text-base text-[var(--muted)] max-w-2xl mx-auto mb-8">
           AI-powered English rewriting for non-native speakers. Transform your
-          writing to sound more natural — and learn why each change was made.
+          writing to sound more natural &mdash; and learn why each change was
+          made.
         </p>
 
         {/* Waitlist Form */}
@@ -291,7 +303,7 @@ export default function Home() {
           </form>
         ) : (
           <p className="text-[var(--success)] font-medium mb-8">
-            Thanks! We&apos;ll notify you when Phrasely launches.
+            Thanks! We&apos;ll notify you when Phrasely Pro launches.
           </p>
         )}
       </section>
@@ -300,7 +312,6 @@ export default function Home() {
       <section className="max-w-2xl mx-auto px-6 pb-12">
         <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] p-6">
           <div className="space-y-4">
-            {/* Input line */}
             <div className="flex items-start gap-3">
               <span className="text-[var(--muted)] text-sm font-medium shrink-0 w-14">
                 Input:
@@ -312,15 +323,11 @@ export default function Home() {
                 )}
               </p>
             </div>
-
-            {/* Arrow */}
             <div
               className={`flex justify-center transition-opacity duration-300 ${phase === "typing-input" ? "opacity-30" : "opacity-100"}`}
             >
-              <span className="text-[var(--accent)] text-xl">↓</span>
+              <span className="text-[var(--accent)] text-xl">{"\u2193"}</span>
             </div>
-
-            {/* Output line */}
             <div className="flex items-start gap-3">
               <span className="text-[var(--muted)] text-sm font-medium shrink-0 w-14">
                 Result:
@@ -368,25 +375,24 @@ export default function Home() {
             placeholder="Paste your text here... (English or Japanese)"
             className="w-full min-h-[160px] px-4 py-3 pr-10 rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
           />
-          {/* Clear button */}
           {inputText && (
             <button
               onClick={handleClear}
               className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer text-sm"
               title="Clear"
             >
-              ×
+              {"\u00D7"}
             </button>
           )}
-          {/* Character count */}
           <span className="absolute bottom-3 right-3 text-xs text-[var(--muted)]">
-            {inputText.length} / 500
+            {inputText.length} / {LIMITS.FREE_MAX_CHARS}
           </span>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-3">
           <span className="text-sm text-[var(--muted)]">
-            {remainingRewrites}/{FREE_LIMIT} rewrites remaining
+            {remainingRewrites}/{LIMITS.FREE_DAILY_REWRITES} rewrites remaining
+            today
           </span>
           <button
             onClick={handleRewrite}
@@ -453,21 +459,23 @@ export default function Home() {
                     className="px-2 py-1 text-xs font-medium rounded bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
                     title="Listen to pronunciation"
                   >
-                    🔊
+                    {"\u{1F50A}"}
                   </button>
                   <button
                     onClick={handleCopy}
                     className="px-3 py-1 text-xs font-medium rounded bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer min-w-[70px]"
                   >
                     {copied ? (
-                      <span className="text-[var(--success)]">✓ Copied</span>
+                      <span className="text-[var(--success)]">
+                        {"\u2713"} Copied
+                      </span>
                     ) : (
                       "Copy"
                     )}
                   </button>
                 </div>
               </div>
-              <p className="text-[var(--foreground)]">{result.rewritten}</p>
+              <RewrittenText text={result.rewritten} />
             </div>
 
             {/* Changes */}
@@ -485,7 +493,9 @@ export default function Home() {
                         : "bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)]"
                     }`}
                   >
-                    {showJapanese ? "日本語 ON" : "日本語"}
+                    {showJapanese
+                      ? "\u65E5\u672C\u8A9E ON"
+                      : "\u65E5\u672C\u8A9E"}
                   </button>
                 </div>
                 <div className="space-y-3">
@@ -498,7 +508,9 @@ export default function Home() {
                         <span className="px-2 py-1 rounded bg-red-500/15 text-red-400 text-sm line-through">
                           {change.original}
                         </span>
-                        <span className="text-[var(--muted)]">→</span>
+                        <span className="text-[var(--muted)]">
+                          {"\u2192"}
+                        </span>
                         <span className="px-2 py-1 rounded bg-emerald-500/15 text-emerald-400 text-sm">
                           {change.replacement}
                         </span>
@@ -507,7 +519,7 @@ export default function Home() {
                           className="px-1.5 py-0.5 text-xs rounded bg-[var(--card)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
                           title="Listen"
                         >
-                          🔊
+                          {"\u{1F50A}"}
                         </button>
                       </div>
                       <p className="text-sm text-[var(--muted)]">
@@ -530,10 +542,9 @@ export default function Home() {
           Features
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Smart Rewrite */}
           <div className="group bg-[var(--card)] p-6 rounded-xl border border-[var(--border)] transition-all duration-200 hover:border-[var(--accent)] hover:-translate-y-1">
             <div className="w-12 h-12 bg-[var(--accent)]/20 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-2xl">✨</span>
+              <span className="text-2xl">{"\u2728"}</span>
             </div>
             <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">
               Smart Rewrite
@@ -543,11 +554,9 @@ export default function Home() {
               instantly.
             </p>
           </div>
-
-          {/* Why Changed */}
           <div className="group bg-[var(--card)] p-6 rounded-xl border border-[var(--border)] transition-all duration-200 hover:border-[var(--accent)] hover:-translate-y-1">
             <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-2xl">📚</span>
+              <span className="text-2xl">{"\u{1F4DA}"}</span>
             </div>
             <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">
               Why Changed
@@ -557,11 +566,9 @@ export default function Home() {
               change matters.
             </p>
           </div>
-
-          {/* Phrase Library */}
           <div className="group bg-[var(--card)] p-6 rounded-xl border border-[var(--border)] transition-all duration-200 hover:border-[var(--accent)] hover:-translate-y-1">
             <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4">
-              <span className="text-2xl">📖</span>
+              <span className="text-2xl">{"\u{1F4D6}"}</span>
             </div>
             <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">
               Phrase Library
@@ -574,7 +581,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section className="max-w-3xl mx-auto px-6 py-12 text-center">
+      <section id="pricing" className="max-w-3xl mx-auto px-6 py-12 text-center">
         <h2 className="text-2xl font-bold text-[var(--foreground)] mb-3">
           Simple Pricing
         </h2>
@@ -590,18 +597,35 @@ export default function Home() {
               $0
             </p>
             <ul className="text-[var(--muted)] text-left space-y-2 text-sm">
-              <li>• 500 characters per request</li>
-              <li>• 10 requests per day</li>
-              <li>• 10 saved phrases</li>
+              <li>
+                {"\u2022"} {LIMITS.FREE_DAILY_REWRITES} rewrites per day
+              </li>
+              <li>
+                {"\u2022"} {LIMITS.FREE_MAX_CHARS} characters per request
+              </li>
+              <li>{"\u2022"} Basic phrase library</li>
             </ul>
           </div>
-          <div className="bg-[var(--accent)] text-white p-6 rounded-xl">
+          <div className="bg-[var(--accent)] text-white p-6 rounded-xl relative overflow-hidden">
+            <div className="absolute top-3 right-3 bg-white/20 text-xs px-2 py-1 rounded-full">
+              Coming Soon
+            </div>
             <h3 className="text-xl font-semibold mb-2">Pro</h3>
-            <p className="text-3xl font-bold mb-4">$10/mo</p>
+            <p className="text-3xl font-bold mb-1">
+              ${PRICING.PRO_MONTHLY}
+              <span className="text-lg font-normal">/mo</span>
+            </p>
+            <p className="text-sm opacity-80 mb-4">
+              or ${PRICING.PRO_ANNUAL_MONTHLY}/mo billed annually
+            </p>
             <ul className="text-left space-y-2 text-sm">
-              <li>• 5,000 characters per request</li>
-              <li>• Unlimited requests</li>
-              <li>• Unlimited saved phrases</li>
+              <li>{"\u2022"} Unlimited rewrites</li>
+              <li>
+                {"\u2022"} {LIMITS.PRO_MAX_CHARS.toLocaleString()} characters
+                per request
+              </li>
+              <li>{"\u2022"} Unlimited phrase library</li>
+              <li>{"\u2022"} Priority support</li>
             </ul>
           </div>
         </div>
@@ -621,7 +645,7 @@ export default function Home() {
               Terms
             </a>
             <span className="order-first sm:order-none">
-              © 2026{" "}
+              {"\u00A9"} 2026{" "}
               <a
                 href="https://kyren.app"
                 target="_blank"
