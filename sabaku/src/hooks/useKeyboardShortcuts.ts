@@ -14,6 +14,7 @@ interface ShortcutHandlers {
   onViewFocus: () => void
   onViewKanban: () => void
   onHelp: () => void
+  onCycleProject: () => void
 }
 
 export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
@@ -62,6 +63,10 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
       case '2':
         e.preventDefault()
         handlers.onViewKanban()
+        break
+      case 'p':
+        e.preventDefault()
+        handlers.onCycleProject()
         break
       case '?':
         e.preventDefault()

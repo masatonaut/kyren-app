@@ -22,6 +22,7 @@ describe('parseTop3', () => {
       category: 'daily-top3',
       source: 'vault',
       status: 'queue',
+      project: null,
     })
     expect(result[1].title).toBe('Upwork proposal 送信')
     expect(result[2].title).toBe('NeetCode DP問題 1問')
@@ -144,7 +145,6 @@ describe('parseMarkdown', () => {
   it('extracts all strips from daily note', () => {
     const md = readFixture('daily-sample.md')
     const strips = parseMarkdown(md)
-    // Top3: 3 + TODO unchecked: 2 + TODO checked: 1 = 6
     expect(strips.length).toBe(6)
   })
 
@@ -156,7 +156,6 @@ describe('parseMarkdown', () => {
 - [ ] Same Task`
     const strips = parseMarkdown(md)
     expect(strips).toHaveLength(1)
-    // Top3 wins (processed first)
     expect(strips[0].priority).toBe('urg')
   })
 
@@ -168,8 +167,51 @@ describe('parseMarkdown', () => {
   it('respects disabled parse rules', () => {
     const md = readFixture('daily-sample.md')
     const strips = parseMarkdown(md, { top3: false, todoSection: true })
-    // Only TODO section: 2 unchecked + 1 checked = 3
     expect(strips).toHaveLength(3)
     expect(strips.every(s => s.category === 'carryover')).toBe(true)
+  })
+})
+
+// ── Project Detection ───────────────────────────────────
+
+describe('project detection', () => {
+  it('extracts project from hashtag', () => {
+    const md = `### 🎯 Today's Top 3
+1. API設定 #kashite`
+    const result = parseTop3(md)
+    expect(result[0].project).toBe('KASHITE')
+    expect(result[0].title).toBe('API設定')
+  })
+
+  it('skips generic category tags', () => {
+    const md = `- [ ] タスク #health`
+    const result = parseCheckboxes(md, 'unchecked')
+    expect(result[0].project).toBeNull()
+  })
+
+  it('infers project from handoff file path', () => {
+    const md = `- [ ] Gumroad ページ確認`
+    const result = parseCheckboxes(md, 'unchecked', '010-journal/handoff/2026/04/2026-04-13/kashite-distribution.md')
+    expect(result[0].project).toBe('KASHITE')
+  })
+
+  it('hashtag takes priority over file path', () => {
+    const md = `- [ ] タスク #sabaku`
+    const result = parseCheckboxes(md, 'unchecked', '010-journal/handoff/2026/04/kashite-doc.md')
+    expect(result[0].project).toBe('SABAKU')
+  })
+
+  it('returns null when no project hint', () => {
+    const md = `### 🎯 Today's Top 3
+1. 普通のタスク`
+    const result = parseTop3(md)
+    expect(result[0].project).toBeNull()
+  })
+
+  it('passes filePath through parseMarkdown', () => {
+    const md = `### 🎯 Today's Top 3
+1. Deploy確認 #phrasely`
+    const strips = parseMarkdown(md, {}, 'some/path.md')
+    expect(strips[0].project).toBe('PHRASELY')
   })
 })

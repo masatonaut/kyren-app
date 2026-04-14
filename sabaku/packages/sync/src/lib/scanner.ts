@@ -24,7 +24,8 @@ export function scanVault(config: SyncConfig): SyncResult[] {
     for (const filePath of files) {
       const content = readFileSync(filePath, 'utf-8')
       const hash = computeHash(content)
-      const strips = parseMarkdown(content, parseOptions)
+      const relPath = relative(config.vaultPath, filePath)
+      const strips = parseMarkdown(content, parseOptions, relPath)
 
       if (strips.length > 0) {
         results.push({

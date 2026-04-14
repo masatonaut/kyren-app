@@ -17,16 +17,28 @@ export default function Home() {
   const [newStripOpen, setNewStripOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
   const [selectedQueueIndex, setSelectedQueueIndex] = useState(0)
+  const [selectedProject, setSelectedProject] = useState<string | null>(null)
 
   const {
     activeStrip,
     queueStrips,
     clearedStrips,
+    projects,
     addStrip,
     moveStrip,
     updateTimer,
     reorderQueue,
   } = useStrips()
+
+  // Filter strips by project
+  const filteredQueue = useMemo(() =>
+    selectedProject ? queueStrips.filter(s => s.project === selectedProject) : queueStrips,
+    [queueStrips, selectedProject]
+  )
+  const filteredCleared = useMemo(() =>
+    selectedProject ? clearedStrips.filter(s => s.project === selectedProject) : clearedStrips,
+    [clearedStrips, selectedProject]
+  )
 
   const { seconds: timerSeconds, isRunning: isTimerRunning, toggle: toggleTimer, reset: resetTimer } = useTimer({
     initialSeconds: activeStrip?.timer_seconds ?? 0,
@@ -48,24 +60,32 @@ export default function Home() {
   }, [activeStrip, moveStrip, resetTimer])
 
   const handleActivate = useCallback((stripId?: string) => {
-    const id = stripId ?? queueStrips[selectedQueueIndex]?.id
+    const id = stripId ?? filteredQueue[selectedQueueIndex]?.id
     if (!id) return
     resetTimer()
     moveStrip(id, 'active')
-  }, [queueStrips, selectedQueueIndex, moveStrip, resetTimer])
+  }, [filteredQueue, selectedQueueIndex, moveStrip, resetTimer])
 
   const handleNavigateUp = useCallback(() => {
     setSelectedQueueIndex(prev => Math.max(0, prev - 1))
   }, [])
 
   const handleNavigateDown = useCallback(() => {
-    setSelectedQueueIndex(prev => Math.min(queueStrips.length - 1, prev + 1))
-  }, [queueStrips.length])
+    setSelectedQueueIndex(prev => Math.min(filteredQueue.length - 1, prev + 1))
+  }, [filteredQueue.length])
 
   const handleClose = useCallback(() => {
     if (helpOpen) setHelpOpen(false)
     else if (newStripOpen) setNewStripOpen(false)
   }, [helpOpen, newStripOpen])
+
+  const handleCycleProject = useCallback(() => {
+    setSelectedProject(prev => {
+      if (prev === null) return projects[0] ?? null
+      const idx = projects.indexOf(prev)
+      return idx < projects.length - 1 ? projects[idx + 1] : null
+    })
+  }, [projects])
 
   const shortcutHandlers = useMemo(() => ({
     onNew: () => setNewStripOpen(true),
@@ -79,7 +99,8 @@ export default function Home() {
     onViewFocus: () => setViewMode('focus'),
     onViewKanban: () => setViewMode('kanban'),
     onHelp: () => setHelpOpen(prev => !prev),
-  }), [activeStrip, toggleTimer, handleDone, handleQueueBack, handleNavigateUp, handleNavigateDown, handleActivate, handleClose])
+    onCycleProject: handleCycleProject,
+  }), [activeStrip, toggleTimer, handleDone, handleQueueBack, handleNavigateUp, handleNavigateDown, handleActivate, handleClose, handleCycleProject])
 
   useKeyboardShortcuts(shortcutHandlers)
 
@@ -90,14 +111,17 @@ export default function Home() {
         onViewChange={setViewMode}
         onNewStrip={() => setNewStripOpen(true)}
         onShowHelp={() => setHelpOpen(true)}
+        projects={projects}
+        selectedProject={selectedProject}
+        onProjectChange={setSelectedProject}
       />
 
       <main className="flex-1 p-4 overflow-hidden">
         {viewMode === 'kanban' ? (
           <KanbanView
             activeStrip={activeStrip}
-            queueStrips={queueStrips}
-            clearedStrips={clearedStrips}
+            queueStrips={filteredQueue}
+            clearedStrips={filteredCleared}
             onMoveStrip={moveStrip}
             onReorderQueue={reorderQueue}
             selectedQueueIndex={selectedQueueIndex}
@@ -105,7 +129,7 @@ export default function Home() {
         ) : (
           <FocusView
             activeStrip={activeStrip}
-            queueStrips={queueStrips}
+            queueStrips={filteredQueue}
             timerSeconds={timerSeconds}
             isTimerRunning={isTimerRunning}
             onToggleTimer={toggleTimer}
@@ -118,14 +142,16 @@ export default function Home() {
 
       <StatusBar
         activeCount={activeStrip ? 1 : 0}
-        queueCount={queueStrips.length}
-        clearedCount={clearedStrips.length}
+        queueCount={filteredQueue.length}
+        clearedCount={filteredCleared.length}
+        selectedProject={selectedProject}
       />
 
       <NewStripModal
         isOpen={newStripOpen}
         onClose={() => setNewStripOpen(false)}
         onSubmit={addStrip}
+        projects={projects}
       />
 
       <ShortcutHelp

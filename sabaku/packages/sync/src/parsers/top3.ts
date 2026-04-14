@@ -1,10 +1,11 @@
 import type { ParsedStrip } from '../types.js'
+import { extractHashtags, resolveProject } from '../lib/project.js'
 
 /**
  * Parse "### 🎯 Today's Top 3" section from daily notes.
  * Extracts numbered list items (1. 2. 3.) as URG priority strips.
  */
-export function parseTop3(markdown: string): ParsedStrip[] {
+export function parseTop3(markdown: string, filePath: string = ''): ParsedStrip[] {
   const strips: ParsedStrip[] = []
 
   // Find the Top 3 heading — support both with and without emoji
@@ -23,8 +24,8 @@ export function parseTop3(markdown: string): ParsedStrip[] {
   const itemPattern = /^\d+\.\s+(.+)$/gm
   let itemMatch: RegExpExecArray | null
   while ((itemMatch = itemPattern.exec(sectionContent)) !== null) {
-    const rawTitle = itemMatch[1].trim()
-    const title = cleanTitle(rawTitle)
+    const raw = itemMatch[1].trim()
+    const { title, hashtags } = extractHashtags(raw)
     if (title) {
       strips.push({
         title,
@@ -32,23 +33,10 @@ export function parseTop3(markdown: string): ParsedStrip[] {
         category: 'daily-top3',
         source: 'vault',
         status: 'queue',
+        project: resolveProject(hashtags, filePath),
       })
     }
   }
 
   return strips
-}
-
-/** Remove metadata tags from title: #hashtag, 📅 date, ⏳S, [WM:*], ⏫ */
-function cleanTitle(raw: string): string {
-  return raw
-    .replace(/#[a-zA-Z]\w*/g, '')   // hashtags (must start with letter)
-    .replace(/📅\s*\d{4}-\d{2}-\d{2}/g, '') // due dates
-    .replace(/⏳[SML]/g, '')        // effort size
-    .replace(/\[WM:[高中低]\]/g, '') // working memory
-    .replace(/⏫/g, '')             // escalation marker
-    .replace(/\*\*/g, '')           // bold markers
-    .replace(/→.*$/g, '')           // action arrows (→ 💡 ...)
-    .replace(/\s+/g, ' ')
-    .trim()
 }

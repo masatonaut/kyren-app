@@ -14,9 +14,9 @@ export interface ParseOptions {
 
 /**
  * Parse a markdown file and extract all strips based on enabled rules.
- * Default: all rules enabled.
+ * filePath is used for project inference from file path.
  */
-export function parseMarkdown(markdown: string, options: ParseOptions = {}): ParsedStrip[] {
+export function parseMarkdown(markdown: string, options: ParseOptions = {}, filePath: string = ''): ParsedStrip[] {
   const {
     top3 = true,
     checkboxUnchecked = true,
@@ -36,14 +36,12 @@ export function parseMarkdown(markdown: string, options: ParseOptions = {}): Par
     }
   }
 
-  // Top3 first (highest priority)
   if (top3) {
-    addUnique(parseTop3(markdown))
+    addUnique(parseTop3(markdown, filePath))
   }
 
-  // TODO section (carryover)
   if (todoSection) {
-    const todo = parseTodoSection(markdown)
+    const todo = parseTodoSection(markdown, filePath)
     if (checkboxUnchecked) addUnique(todo.unchecked)
     if (checkboxChecked) addUnique(todo.checked)
   }

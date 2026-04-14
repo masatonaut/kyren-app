@@ -94,6 +94,14 @@ export default function StripCard({ strip, displayIndex, isSelected, showTimer, 
             {categoryLabels[strip.category] ?? strip.category}
           </span>
           <span className="text-[11px] text-text-tertiary">·</span>
+          {strip.project && (
+            <>
+              <span className="text-[11px] text-accent font-medium">
+                {strip.project}
+              </span>
+              <span className="text-[11px] text-text-tertiary">·</span>
+            </>
+          )}
           {strip.source === 'vault' ? (
             <span className="flex items-center gap-0.5 text-[11px] text-source-vault">
               <Link2 size={10} />

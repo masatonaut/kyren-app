@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import type { Strip, StripStatus, StripPriority, StripCategory } from '@/types'
 
 let stripCounter = 0
@@ -10,6 +10,7 @@ function createStrip(
   priority: StripPriority = 'nrm',
   category: StripCategory = 'manual',
   source: 'vault' | 'manual' = 'manual',
+  project: string | null = null,
   vaultRef: string | null = null
 ): Strip {
   stripCounter++
@@ -21,6 +22,7 @@ function createStrip(
     priority,
     category,
     source,
+    project,
     vault_ref: vaultRef,
     timer_seconds: 0,
     position: stripCounter,
@@ -30,17 +32,17 @@ function createStrip(
   }
 }
 
-// Demo strips for development
 function getDemoStrips(): Strip[] {
-  const demos: Array<{ title: string; priority: StripPriority; category: StripCategory; source: 'vault' | 'manual' }> = [
-    { title: 'KASHITE Resend API 設定', priority: 'urg', category: 'daily-top3', source: 'vault' },
-    { title: 'Upwork proposal 送信', priority: 'urg', category: 'daily-top3', source: 'vault' },
-    { title: 'NeetCode DP問題 1問', priority: 'urg', category: 'daily-top3', source: 'vault' },
-    { title: 'Phrasely Vercel deploy', priority: 'nrm', category: 'handoff', source: 'vault' },
-    { title: 'Eagle Eye DIFF 適用', priority: 'nrm', category: 'handoff', source: 'vault' },
-    { title: 'X 告知文ドラフト', priority: 'low', category: 'manual', source: 'manual' },
+  const demos: Array<{ title: string; priority: StripPriority; category: StripCategory; source: 'vault' | 'manual'; project: string | null }> = [
+    { title: 'KASHITE Resend API 設定', priority: 'urg', category: 'daily-top3', source: 'vault', project: 'KASHITE' },
+    { title: 'Upwork proposal 送信', priority: 'urg', category: 'daily-top3', source: 'vault', project: 'FREELANCE' },
+    { title: 'NeetCode DP問題 1問', priority: 'urg', category: 'daily-top3', source: 'vault', project: null },
+    { title: 'Phrasely Vercel deploy', priority: 'nrm', category: 'handoff', source: 'vault', project: 'PHRASELY' },
+    { title: 'Eagle Eye DIFF 適用', priority: 'nrm', category: 'handoff', source: 'vault', project: 'KYREN' },
+    { title: 'SABAKU project filter 実装', priority: 'nrm', category: 'manual', source: 'manual', project: 'SABAKU' },
+    { title: 'X 告知文ドラフト', priority: 'low', category: 'manual', source: 'manual', project: null },
   ]
-  return demos.map(d => createStrip(d.title, d.priority, d.category, d.source))
+  return demos.map(d => createStrip(d.title, d.priority, d.category, d.source, d.project))
 }
 
 export function useStrips() {
@@ -58,13 +60,17 @@ export function useStrips() {
       return new Date(bTime).getTime() - new Date(aTime).getTime()
     })
 
-  const addStrip = useCallback((title: string, priority: StripPriority, category: StripCategory) => {
-    setStrips(prev => [...prev, createStrip(title, priority, category)])
+  const projects = useMemo(() =>
+    [...new Set(strips.map(s => s.project).filter((p): p is string => p !== null))].sort(),
+    [strips]
+  )
+
+  const addStrip = useCallback((title: string, priority: StripPriority, category: StripCategory, project: string | null = null) => {
+    setStrips(prev => [...prev, createStrip(title, priority, category, 'manual', project)])
   }, [])
 
   const moveStrip = useCallback((stripId: string, newStatus: StripStatus) => {
     setStrips(prev => {
-      // If moving to active, deactivate current active first
       let updated = prev
       if (newStatus === 'active') {
         updated = updated.map(s =>
@@ -107,6 +113,7 @@ export function useStrips() {
     activeStrip,
     queueStrips,
     clearedStrips,
+    projects,
     addStrip,
     moveStrip,
     updateTimer,

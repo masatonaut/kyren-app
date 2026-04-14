@@ -8,6 +8,7 @@ export interface ParsedStrip {
   category: StripCategory
   source: 'vault'
   status: 'queue' | 'cleared'
+  project: string | null
 }
 
 export interface SyncConfig {

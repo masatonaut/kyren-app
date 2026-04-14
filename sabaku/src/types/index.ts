@@ -11,6 +11,7 @@ export interface Strip {
   priority: StripPriority
   category: StripCategory
   source: StripSource
+  project: string | null
   vault_ref: string | null
   timer_seconds: number
   position: number

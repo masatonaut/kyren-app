@@ -8,7 +8,8 @@ import { cn } from '@/lib/utils'
 interface NewStripModalProps {
   isOpen: boolean
   onClose: () => void
-  onSubmit: (title: string, priority: StripPriority, category: StripCategory) => void
+  onSubmit: (title: string, priority: StripPriority, category: StripCategory, project: string | null) => void
+  projects: string[]
 }
 
 const priorities: { value: StripPriority; label: string }[] = [
@@ -17,9 +18,10 @@ const priorities: { value: StripPriority; label: string }[] = [
   { value: 'low', label: 'LOW' },
 ]
 
-export default function NewStripModal({ isOpen, onClose, onSubmit }: NewStripModalProps) {
+export default function NewStripModal({ isOpen, onClose, onSubmit, projects }: NewStripModalProps) {
   const [title, setTitle] = useState('')
   const [priority, setPriority] = useState<StripPriority>('nrm')
+  const [project, setProject] = useState('')
   const [category] = useState<StripCategory>('manual')
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -27,6 +29,7 @@ export default function NewStripModal({ isOpen, onClose, onSubmit }: NewStripMod
     if (isOpen) {
       setTitle('')
       setPriority('nrm')
+      setProject('')
       setTimeout(() => inputRef.current?.focus(), 50)
     }
   }, [isOpen])
@@ -37,15 +40,15 @@ export default function NewStripModal({ isOpen, onClose, onSubmit }: NewStripMod
     e.preventDefault()
     const trimmed = title.trim()
     if (!trimmed) return
-    onSubmit(trimmed, priority, category)
+    const proj = project.trim() ? project.trim().toUpperCase() : null
+    onSubmit(trimmed, priority, category, proj)
     onClose()
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative bg-bg-secondary border border-border rounded-lg w-full max-w-md p-6 shadow-2xl">
-        {/* Header */}
+      <div className="relative bg-bg-secondary border border-border rounded-lg w-full max-w-md p-6 shadow-2xl animate-fade-in">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-[15px] font-medium">New Strip</h2>
           <button onClick={onClose} className="text-text-tertiary hover:text-text-primary transition-colors">
@@ -68,7 +71,7 @@ export default function NewStripModal({ isOpen, onClose, onSubmit }: NewStripMod
           </div>
 
           {/* Priority */}
-          <div className="mb-6">
+          <div className="mb-4">
             <label className="text-[12px] text-text-secondary block mb-1.5">Priority</label>
             <div className="flex gap-2">
               {priorities.map((p) => (
@@ -88,6 +91,22 @@ export default function NewStripModal({ isOpen, onClose, onSubmit }: NewStripMod
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Project */}
+          <div className="mb-6">
+            <label className="text-[12px] text-text-secondary block mb-1.5">Project (optional)</label>
+            <input
+              type="text"
+              value={project}
+              onChange={(e) => setProject(e.target.value)}
+              placeholder="e.g. KASHITE"
+              list="project-suggestions"
+              className="w-full bg-bg-primary border border-border rounded px-3 py-2 text-[13px] text-text-primary placeholder:text-text-tertiary focus:outline-none focus:border-accent/50 transition-colors"
+            />
+            <datalist id="project-suggestions">
+              {projects.map(p => <option key={p} value={p} />)}
+            </datalist>
           </div>
 
           {/* Actions */}

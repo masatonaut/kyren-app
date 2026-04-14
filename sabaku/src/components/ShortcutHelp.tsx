@@ -17,6 +17,7 @@ const shortcuts = [
   { key: 'Esc', action: 'モーダル閉じ' },
   { key: '1', action: 'Focus ビュー' },
   { key: '2', action: 'Kanban ビュー' },
+  { key: 'p', action: 'プロジェクトフィルター切替' },
   { key: '?', action: 'ショートカット一覧' },
 ]
 
