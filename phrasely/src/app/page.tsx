@@ -17,11 +17,18 @@ interface RewriteResult {
     used: number;
     limit: number;
     remaining: number;
+    isPro?: boolean;
   };
 }
 
 // Limit Modal Component
-const LimitModal = ({ onClose }: { onClose: () => void }) => (
+const LimitModal = ({
+  onClose,
+  onUpgrade,
+}: {
+  onClose: () => void;
+  onUpgrade: () => void;
+}) => (
   <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
     <div className="bg-[var(--card)] p-6 rounded-xl max-w-md mx-4 border border-[var(--border)]">
       <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">
@@ -29,7 +36,8 @@ const LimitModal = ({ onClose }: { onClose: () => void }) => (
       </h3>
       <p className="text-[var(--muted)] mb-4">
         You&apos;ve used all {LIMITS.FREE_DAILY_REWRITES} free rewrites for
-        today. Upgrade to Pro for unlimited rewrites.
+        today. Upgrade to Pro for unlimited rewrites at just $
+        {PRICING.PRO_MONTHLY}/mo.
       </p>
       <div className="flex gap-3">
         <button
@@ -38,13 +46,12 @@ const LimitModal = ({ onClose }: { onClose: () => void }) => (
         >
           Close
         </button>
-        <a
-          href="#pricing"
-          onClick={onClose}
-          className="px-4 py-2 rounded-lg bg-[var(--accent)] text-white font-medium hover:bg-[var(--accent)]/90 transition"
+        <button
+          onClick={onUpgrade}
+          className="px-4 py-2 rounded-lg bg-[var(--accent)] text-white font-medium hover:bg-[var(--accent)]/90 transition cursor-pointer"
         >
           Upgrade to Pro
-        </a>
+        </button>
       </div>
     </div>
   </div>
@@ -114,11 +121,14 @@ export default function Home() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
-  const [remainingRewrites, setRemainingRewrites] = useState(
+  const [remainingRewrites, setRemainingRewrites] = useState<number>(
     LIMITS.FREE_DAILY_REWRITES
   );
   const [targetStyle, setTargetStyle] = useState<StyleValue>("casual");
   const [showJapanese, setShowJapanese] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [proEmail, setProEmail] = useState<string | null>(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
 
   // Typewriter effect state
   const [displayedInput, setDisplayedInput] = useState("");
@@ -127,17 +137,74 @@ export default function Home() {
     "typing-input" | "pause" | "typing-output" | "done"
   >("typing-input");
 
-  // Fetch remaining rewrites from server on mount
+  // Check Pro status and fetch usage on mount
   useEffect(() => {
-    fetch("/api/usage")
+    const stored = localStorage.getItem("phrasely_pro_email");
+    const params = new URLSearchParams(window.location.search);
+    const successEmail = params.get("email");
+
+    // Handle Stripe success redirect
+    if (params.get("success") === "true" && successEmail) {
+      localStorage.setItem("phrasely_pro_email", successEmail);
+      setProEmail(successEmail);
+      setIsPro(true);
+      setRemainingRewrites(-1);
+      // Clean URL
+      window.history.replaceState({}, "", "/");
+      return;
+    }
+
+    const emailToCheck = stored || null;
+    setProEmail(emailToCheck);
+
+    const usageUrl = emailToCheck
+      ? `/api/usage?email=${encodeURIComponent(emailToCheck)}`
+      : "/api/usage";
+
+    fetch(usageUrl)
       .then((r) => r.json())
       .then((data) => {
-        if (typeof data.remaining === "number") {
+        if (data.isPro) {
+          setIsPro(true);
+          setRemainingRewrites(-1);
+        } else if (typeof data.remaining === "number") {
           setRemainingRewrites(data.remaining);
+          // If stored email is not Pro, clear it
+          if (emailToCheck) {
+            localStorage.removeItem("phrasely_pro_email");
+            setProEmail(null);
+          }
         }
       })
       .catch(() => {});
   }, []);
+
+  const handleUpgrade = async () => {
+    setCheckoutLoading(true);
+    const upgradeEmail =
+      proEmail || email || prompt("Enter your email for Pro upgrade:");
+    if (!upgradeEmail) {
+      setCheckoutLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: upgradeEmail }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error || "Failed to start checkout");
+      }
+    } catch {
+      setError("Failed to start checkout");
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   // Typewriter effect
   useEffect(() => {
@@ -222,7 +289,11 @@ export default function Home() {
       const res = await fetch("/api/rewrite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: inputText, targetStyle }),
+        body: JSON.stringify({
+          text: inputText,
+          targetStyle,
+          ...(proEmail && { proEmail }),
+        }),
       });
 
       const data = await res.json();
@@ -257,7 +328,13 @@ export default function Home() {
     <main className="min-h-screen bg-[var(--background)]">
       {/* Limit Modal */}
       {showLimitModal && (
-        <LimitModal onClose={() => setShowLimitModal(false)} />
+        <LimitModal
+          onClose={() => setShowLimitModal(false)}
+          onUpgrade={() => {
+            setShowLimitModal(false);
+            handleUpgrade();
+          }}
+        />
       )}
 
       {/* Hero */}
@@ -385,14 +462,17 @@ export default function Home() {
             </button>
           )}
           <span className="absolute bottom-3 right-3 text-xs text-[var(--muted)]">
-            {inputText.length} / {LIMITS.FREE_MAX_CHARS}
+            {inputText.length} / {isPro ? LIMITS.PRO_MAX_CHARS : LIMITS.FREE_MAX_CHARS}
           </span>
         </div>
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-3">
           <span className="text-sm text-[var(--muted)]">
-            {remainingRewrites}/{LIMITS.FREE_DAILY_REWRITES} rewrites remaining
-            today
+            {isPro ? (
+              <span className="text-[var(--accent)]">Pro — Unlimited rewrites</span>
+            ) : (
+              `${remainingRewrites}/${LIMITS.FREE_DAILY_REWRITES} rewrites remaining today`
+            )}
           </span>
           <button
             onClick={handleRewrite}
@@ -607,9 +687,11 @@ export default function Home() {
             </ul>
           </div>
           <div className="bg-[var(--accent)] text-white p-6 rounded-xl relative overflow-hidden">
-            <div className="absolute top-3 right-3 bg-white/20 text-xs px-2 py-1 rounded-full">
-              Coming Soon
-            </div>
+            {isPro && (
+              <div className="absolute top-3 right-3 bg-white/20 text-xs px-2 py-1 rounded-full">
+                Active
+              </div>
+            )}
             <h3 className="text-xl font-semibold mb-2">Pro</h3>
             <p className="text-3xl font-bold mb-1">
               ${PRICING.PRO_MONTHLY}
@@ -618,7 +700,7 @@ export default function Home() {
             <p className="text-sm opacity-80 mb-4">
               or ${PRICING.PRO_ANNUAL_MONTHLY}/mo billed annually
             </p>
-            <ul className="text-left space-y-2 text-sm">
+            <ul className="text-left space-y-2 text-sm mb-4">
               <li>{"\u2022"} Unlimited rewrites</li>
               <li>
                 {"\u2022"} {LIMITS.PRO_MAX_CHARS.toLocaleString()} characters
@@ -627,6 +709,15 @@ export default function Home() {
               <li>{"\u2022"} Unlimited phrase library</li>
               <li>{"\u2022"} Priority support</li>
             </ul>
+            {!isPro && (
+              <button
+                onClick={handleUpgrade}
+                disabled={checkoutLoading}
+                className="w-full py-2.5 bg-white text-[var(--accent)] font-semibold rounded-lg hover:bg-white/90 transition cursor-pointer disabled:opacity-50"
+              >
+                {checkoutLoading ? "Loading..." : "Get Pro"}
+              </button>
+            )}
           </div>
         </div>
       </section>
