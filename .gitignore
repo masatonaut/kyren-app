@@ -1,0 +1,14 @@
+.vercel
+.DS_Store
+node_modules/
+.next/
+.env.local
+.env
+*.tsbuildinfo
+og.svg
+
+# Subprojects managed separately
+phrasely/
+yomu/
+sabaku/
+thoughts

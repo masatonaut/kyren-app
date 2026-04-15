@@ -3,29 +3,49 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kyren</title>
-  <meta name="description" content="Micro-SaaS studio. Focused tools for everyday life.">
+  <title>Kyren — Focused tools for everyday life</title>
+  <meta name="description" content="A small product studio building focused tools for everyday life. Built in Tokyo.">
   <meta property="og:title" content="Kyren">
-  <meta property="og:description" content="Focused tools for everyday life. Built in Tokyo.">
+  <meta property="og:description" content="A small product studio building focused tools for everyday life.">
   <meta property="og:url" content="https://kyren.app">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="https://kyren.app/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Kyren">
+  <meta name="twitter:description" content="A small product studio building focused tools for everyday life.">
+  <meta name="twitter:image" content="https://kyren.app/og.png">
+  <meta name="twitter:site" content="@masatobuilds">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>K</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=Söhne,ui-sans-serif,system-ui,sans-serif&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0b0b;
-      --text: #999;
-      --text-bright: #e8e8e8;
-      --text-dim: #555;
-      --accent: #e8e8e8;
-      --link: #e8e8e8;
-      --border: #1a1a1a;
-      --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
-      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      --bg: #09090b;
+      --surface: #111113;
+      --surface-hover: #18181b;
+      --border: #1e1e22;
+      --border-subtle: #151518;
+      --text: #a1a1aa;
+      --text-bright: #fafafa;
+      --text-dim: #52525b;
+      --accent: #a1a1aa;
+      --green: #22c55e;
+      --green-dim: rgba(34, 197, 94, 0.15);
+      --amber: #f59e0b;
+      --amber-dim: rgba(245, 158, 11, 0.15);
+      --serif: 'Newsreader', Georgia, serif;
+      --sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --mono: 'SF Mono', 'Fira Code', monospace;
     }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { font-size: 17px; }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
     body {
       background: var(--bg);
       color: var(--text);
@@ -33,237 +53,640 @@
       font-weight: 400;
       line-height: 1.6;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
+      overflow-x: hidden;
     }
+
+    /* -- Layout -- */
     .page {
-      max-width: 600px;
+      max-width: 720px;
       margin: 0 auto;
       padding: 0 1.5rem;
     }
-    /* -- Header -- */
-    header {
-      padding: 4rem 0 0;
-      margin-bottom: 8rem;
+
+    /* -- Fade-in animation -- */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
     }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* -- Nav -- */
+    nav {
+      padding: 2rem 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     .wordmark {
       font-family: var(--sans);
       font-size: 0.8rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
+      font-weight: 600;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-dim);
     }
-    /* -- Intro -- */
-    .intro {
-      margin-bottom: 8rem;
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
     }
-    .intro h1 {
+
+    .nav-links a {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    /* -- Hero -- */
+    .hero {
+      padding: 8rem 0 6rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .hero h1 {
       font-family: var(--serif);
       font-weight: 300;
-      font-size: 2rem;
-      line-height: 1.4;
+      font-size: 2.5rem;
+      line-height: 1.3;
       color: var(--text-bright);
-      margin-bottom: 2rem;
-      letter-spacing: -0.01em;
-      max-width: 520px;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.02em;
+      max-width: 580px;
     }
-    .intro p {
-      font-size: 0.95rem;
+
+    .hero p {
+      font-size: 1rem;
       color: var(--text);
-      max-width: 440px;
+      max-width: 480px;
       line-height: 1.7;
+      margin-bottom: 2.5rem;
     }
+
+    .hero-stats {
+      display: flex;
+      gap: 3rem;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-number {
+      font-family: var(--sans);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      letter-spacing: -0.02em;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 0.15rem;
+    }
+
     /* -- Products -- */
     .products {
-      margin-bottom: 8rem;
+      padding: 5rem 0;
     }
-    .products-label {
+
+    .section-label {
       font-size: 0.7rem;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 0.15em;
       text-transform: uppercase;
       color: var(--text-dim);
-      margin-bottom: 2rem;
+      margin-bottom: 2.5rem;
     }
-    .product-item {
-      display: block;
-      padding: 1.2rem 0;
-      border-top: 1px solid var(--border);
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .product-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
       text-decoration: none;
       color: inherit;
-      transition: padding-left 0.2s ease;
+      transition: border-color 0.2s, background 0.2s, transform 0.15s;
+      display: flex;
+      flex-direction: column;
+      min-height: 200px;
     }
-    .product-item:last-child {
-      border-bottom: 1px solid var(--border);
+
+    .product-card:hover {
+      border-color: #2a2a2e;
+      background: var(--surface-hover);
+      transform: translateY(-2px);
     }
-    .product-item:hover {
-      padding-left: 0.5rem;
-    }
-    .product-item:hover .product-item__name {
-      color: var(--text-bright);
-    }
-    .product-item__row {
+
+    .product-card__header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: flex-start;
+      margin-bottom: 0.75rem;
     }
-    .product-item__name {
-      font-family: var(--sans);
-      font-size: 0.95rem;
+
+    .product-card__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .product-card__badge {
+      font-size: 0.65rem;
       font-weight: 500;
+      letter-spacing: 0.04em;
+      padding: 0.2rem 0.5rem;
+      border-radius: 100px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      white-space: nowrap;
+    }
+
+    .badge-live {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+
+    .badge-building {
+      background: var(--amber-dim);
+      color: var(--amber);
+    }
+
+    .badge-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .badge-live .badge-dot { background: var(--green); }
+    .badge-building .badge-dot { background: var(--amber); }
+
+    .product-card__name {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-bright);
+      margin-bottom: 0.35rem;
+    }
+
+    .product-card__desc {
+      font-size: 0.85rem;
       color: var(--text);
-      transition: color 0.2s;
+      line-height: 1.5;
+      flex: 1;
     }
-    .product-item__meta {
-      font-size: 0.75rem;
+
+    .product-card__footer {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .tech-badge {
+      font-size: 0.65rem;
+      font-family: var(--mono);
       color: var(--text-dim);
+      background: var(--bg);
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
     }
-    .product-item__desc {
+
+    .product-card__cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
       font-size: 0.8rem;
       color: var(--text-dim);
-      margin-top: 0.25rem;
+      margin-top: 1rem;
+      transition: color 0.2s;
     }
-    .live-dot {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      background: #22c55e;
-      border-radius: 50%;
-      margin-right: 0.4rem;
-      vertical-align: middle;
+
+    .product-card:hover .product-card__cta {
+      color: var(--text-bright);
     }
+
+    .product-card__cta svg {
+      width: 14px;
+      height: 14px;
+      transition: transform 0.2s;
+    }
+
+    .product-card:hover .product-card__cta svg {
+      transform: translateX(2px);
+    }
+
     /* -- About -- */
     .about {
-      margin-bottom: 8rem;
+      padding: 5rem 0;
+      border-top: 1px solid var(--border-subtle);
     }
-    .about p {
+
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+    }
+
+    .about-text h2 {
       font-family: var(--serif);
-      font-size: 1.15rem;
       font-weight: 300;
-      font-style: italic;
+      font-size: 1.6rem;
+      color: var(--text-bright);
+      line-height: 1.4;
+      margin-bottom: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .about-text p {
+      font-size: 0.9rem;
       color: var(--text);
       line-height: 1.7;
-      max-width: 500px;
+      margin-bottom: 1rem;
     }
+
+    .about-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    .about-links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .about-link {
+      font-size: 0.8rem;
+      color: var(--text);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .about-link:hover {
+      border-color: #2a2a2e;
+      color: var(--text-bright);
+    }
+
+    .about-link svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .stack-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding-top: 0.5rem;
+    }
+
+    .stack-category {
+      margin-bottom: 0.5rem;
+    }
+
+    .stack-category__label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .stack-category__items {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .stack-tag {
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      color: var(--text);
+      background: var(--surface);
+      padding: 0.25rem 0.6rem;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+    }
+
     /* -- Footer -- */
     footer {
       padding: 3rem 0;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid var(--border-subtle);
     }
-    .footer-top {
+
+    .footer-main {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
       flex-wrap: wrap;
       gap: 1rem;
     }
-    .footer-links {
+
+    .footer-tagline {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .footer-tagline span {
+      color: var(--text);
+    }
+
+    .footer-nav {
       display: flex;
       gap: 1.5rem;
     }
-    .footer-links a {
-      font-size: 0.75rem;
+
+    .footer-nav a {
+      font-size: 0.8rem;
       color: var(--text-dim);
       text-decoration: none;
       transition: color 0.2s;
     }
-    .footer-links a:hover { color: var(--text); }
+
+    .footer-nav a:hover { color: var(--text); }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
     .footer-copy {
       font-size: 0.7rem;
       color: var(--text-dim);
-      opacity: 0.6;
+      opacity: 0.7;
     }
-    .footer-legal-links {
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
+
+    .footer-legal {
       display: flex;
       gap: 1.5rem;
-      flex-wrap: wrap;
     }
-    .footer-legal-links a {
+
+    .footer-legal a {
       font-size: 0.7rem;
       color: var(--text-dim);
       text-decoration: none;
       transition: color 0.2s;
-      letter-spacing: 0.02em;
     }
-    .footer-legal-links a:hover { color: var(--text); }
+
+    .footer-legal a:hover { color: var(--text); }
+
     /* -- Responsive -- */
-    @media (max-width: 480px) {
-      header { margin-bottom: 5rem; }
-      .intro, .products, .about { margin-bottom: 5rem; }
-      .intro h1 { font-size: 1.7rem; }
-      .product-item__row { flex-direction: column; gap: 0.2rem; }
+    @media (max-width: 640px) {
+      .hero { padding: 5rem 0 4rem; }
+      .hero h1 { font-size: 1.85rem; }
+      .hero-stats { gap: 2rem; }
+      .product-grid { grid-template-columns: 1fr; }
+      .about-content { grid-template-columns: 1fr; gap: 2rem; }
+      .products, .about { padding: 3.5rem 0; }
+      .footer-main { flex-direction: column; }
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <header>
+
+    <!-- Nav -->
+    <nav>
       <div class="wordmark">Kyren</div>
-    </header>
-    <section class="intro">
+      <div class="nav-links">
+        <a href="https://github.com/masatonaut" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://x.com/masatobuilds" target="_blank" rel="noopener">X</a>
+        <a href="mailto:hey@kyren.app">Contact</a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero fade-in">
       <h1>A small studio building focused tools for everyday life.</h1>
       <p>Each product solves one problem well. Nothing more, nothing less. Built in Tokyo with care.</p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-number">4</span>
+          <span class="stat-label">Products</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">3</span>
+          <span class="stat-label">Live</span>
+        </div>
+        <div class="stat">
+          <span class="stat-number">1</span>
+          <span class="stat-label">Engineer</span>
+        </div>
+      </div>
     </section>
+
+    <!-- Products -->
     <section class="products">
-      <div class="products-label">Products</div>
-      <a href="https://kashite-amber.vercel.app" class="product-item" target="_blank">
-        <div class="product-item__row">
-          <span class="product-item__name">KASHITE</span>
-          <span class="product-item__meta"><span class="live-dot"></span>Live</span>
+      <div class="section-label fade-in">Products</div>
+      <div class="product-grid">
+
+        <!-- KASHITE -->
+        <a href="https://kashite.kyren.app" class="product-card fade-in" target="_blank" rel="noopener">
+          <div class="product-card__header">
+            <div class="product-card__icon">K</div>
+            <span class="product-card__badge badge-live"><span class="badge-dot"></span>Live</span>
+          </div>
+          <div class="product-card__name">KASHITE</div>
+          <div class="product-card__desc">Track who borrowed what. Get it back. A dead-simple lending tracker.</div>
+          <div class="product-card__footer">
+            <span class="tech-badge">Next.js</span>
+            <span class="tech-badge">Supabase</span>
+            <span class="tech-badge">Stripe</span>
+          </div>
+          <div class="product-card__cta">
+            Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </div>
+        </a>
+
+        <!-- YOMU -->
+        <a href="https://yomu.kyren.app" class="product-card fade-in" target="_blank" rel="noopener">
+          <div class="product-card__header">
+            <div class="product-card__icon">Y</div>
+            <span class="product-card__badge badge-live"><span class="badge-dot"></span>Live</span>
+          </div>
+          <div class="product-card__name">YOMU</div>
+          <div class="product-card__desc">AI reading assistant. Upload a book, ask questions, get insights.</div>
+          <div class="product-card__footer">
+            <span class="tech-badge">Next.js</span>
+            <span class="tech-badge">Supabase</span>
+            <span class="tech-badge">Claude API</span>
+          </div>
+          <div class="product-card__cta">
+            Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </div>
+        </a>
+
+        <!-- Phrasely -->
+        <a href="https://phrasely.kyren.app" class="product-card fade-in" target="_blank" rel="noopener">
+          <div class="product-card__header">
+            <div class="product-card__icon">P</div>
+            <span class="product-card__badge badge-live"><span class="badge-dot"></span>Live</span>
+          </div>
+          <div class="product-card__name">Phrasely</div>
+          <div class="product-card__desc">Write better English. Get context-aware suggestions and learn why they work.</div>
+          <div class="product-card__footer">
+            <span class="tech-badge">Next.js</span>
+            <span class="tech-badge">Supabase</span>
+            <span class="tech-badge">Claude API</span>
+          </div>
+          <div class="product-card__cta">
+            Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          </div>
+        </a>
+
+        <!-- SABAKU -->
+        <div class="product-card fade-in">
+          <div class="product-card__header">
+            <div class="product-card__icon">S</div>
+            <span class="product-card__badge badge-building"><span class="badge-dot"></span>Building</span>
+          </div>
+          <div class="product-card__name">SABAKU</div>
+          <div class="product-card__desc">Task management inspired by air traffic control strips. Visual, spatial, decisive.</div>
+          <div class="product-card__footer">
+            <span class="tech-badge">Next.js</span>
+            <span class="tech-badge">Supabase</span>
+            <span class="tech-badge">DnD Kit</span>
+          </div>
         </div>
-        <div class="product-item__desc">Track who borrowed what. Get it back.</div>
-      </a>
-      <div class="product-item">
-        <div class="product-item__row">
-          <span class="product-item__name">Phrasely</span>
-          <span class="product-item__meta">Coming soon</span>
-        </div>
-        <div class="product-item__desc">Write better English. Learn why it's better.</div>
-      </div>
-      <div class="product-item">
-        <div class="product-item__row">
-          <span class="product-item__name">RecMe</span>
-          <span class="product-item__meta">Coming soon</span>
-        </div>
-        <div class="product-item__desc">Save and share recommendations from friends.</div>
-      </div>
-      <div class="product-item">
-        <div class="product-item__row">
-          <span class="product-item__name">ShipLog</span>
-          <span class="product-item__meta">Coming soon</span>
-        </div>
-        <div class="product-item__desc">A build-in-public journal for makers.</div>
-      </div>
-      <div class="product-item">
-        <div class="product-item__row">
-          <span class="product-item__name">InvoiceQ</span>
-          <span class="product-item__meta">Coming soon</span>
-        </div>
-        <div class="product-item__desc">Create invoices in one click.</div>
+
       </div>
     </section>
+
+    <!-- About -->
     <section class="about">
-      <p>Kyren is one engineer, building from Tokyo, heading to Los Angeles. Every tool follows Kanso — the Japanese principle of simplicity. Strip away the unnecessary. Leave only what matters.</p>
+      <div class="about-content fade-in">
+        <div class="about-text">
+          <h2>One engineer, building from Tokyo.</h2>
+          <p>Kyren follows Kanso — the Japanese principle of simplicity. Strip away the unnecessary. Every tool is built to do one thing well, ship fast, and stay maintainable by one person.</p>
+          <p>No investor decks. No feature bloat. Just tools that solve real problems, launched when they're ready.</p>
+          <div class="about-links">
+            <a href="https://github.com/masatonaut" class="about-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+              GitHub
+            </a>
+            <a href="https://x.com/masatobuilds" class="about-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
+              X
+            </a>
+            <a href="https://masatonaut.dev" class="about-link" target="_blank" rel="noopener">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-1.5 2-2.5 4-2.5 6.5s1 4.5 2.5 6.5c1.5-2 2.5-4 2.5-6.5s-1-4.5-2.5-6.5"/></svg>
+              Portfolio
+            </a>
+          </div>
+        </div>
+        <div class="stack-list">
+          <div class="stack-category">
+            <div class="stack-category__label">Frontend</div>
+            <div class="stack-category__items">
+              <span class="stack-tag">Next.js</span>
+              <span class="stack-tag">React</span>
+              <span class="stack-tag">TypeScript</span>
+              <span class="stack-tag">TailwindCSS</span>
+            </div>
+          </div>
+          <div class="stack-category">
+            <div class="stack-category__label">Backend</div>
+            <div class="stack-category__items">
+              <span class="stack-tag">Supabase</span>
+              <span class="stack-tag">PostgreSQL</span>
+              <span class="stack-tag">Stripe</span>
+            </div>
+          </div>
+          <div class="stack-category">
+            <div class="stack-category__label">AI</div>
+            <div class="stack-category__items">
+              <span class="stack-tag">Claude API</span>
+              <span class="stack-tag">Claude Code</span>
+            </div>
+          </div>
+          <div class="stack-category">
+            <div class="stack-category__label">Infra</div>
+            <div class="stack-category__items">
+              <span class="stack-tag">Vercel</span>
+              <span class="stack-tag">GitHub Actions</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
+
+    <!-- Footer -->
     <footer>
-      <div class="footer-top">
-        <span class="footer-copy">&copy; 2026 Kyren</span>
-        <div class="footer-links">
-          <a href="https://x.com/masatobuilds" target="_blank">X</a>
-          <a href="https://github.com/masatonaut" target="_blank">GitHub</a>
+      <div class="footer-main">
+        <div class="footer-tagline">Built with <span>Next.js + Supabase</span>. Designed in Tokyo.</div>
+        <div class="footer-nav">
+          <a href="https://github.com/masatonaut" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://x.com/masatobuilds" target="_blank" rel="noopener">X</a>
           <a href="mailto:hey@kyren.app">Contact</a>
         </div>
       </div>
-      <div class="footer-legal-links">
-        <a href="/terms">利用規約</a>
-        <a href="/privacy">プライバシーポリシー</a>
-        <a href="/tokushoho">特定商取引法に基づく表記</a>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 Kyren</span>
+        <div class="footer-legal">
+          <a href="/terms">Terms</a>
+          <a href="/privacy">Privacy</a>
+          <a href="/tokushoho">Tokushoho</a>
+        </div>
       </div>
     </footer>
+
   </div>
+
+  <script>
+    // Intersection Observer for fade-in animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+  </script>
 </body>
 </html>
