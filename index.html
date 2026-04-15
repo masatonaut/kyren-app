@@ -21,385 +21,104 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-
-    :root {
-      --bg: #0a0a0a;
-      --bg-card: #111;
-      --bg-card-hover: #161616;
-      --border: rgba(255,255,255,0.06);
-      --border-hover: rgba(255,255,255,0.12);
-      --text: rgba(255,255,255,0.5);
-      --text-bright: rgba(255,255,255,0.92);
-      --text-dim: rgba(255,255,255,0.28);
-      --green: #34d399;
-      --green-bg: rgba(52,211,153,0.1);
-      --amber: #fbbf24;
-      --amber-bg: rgba(251,191,36,0.1);
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
-      --mono: 'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', monospace;
+    :root{
+      --bg:#0a0a0a;--card:#111;--card-h:#161616;
+      --b:rgba(255,255,255,.06);--bh:rgba(255,255,255,.12);
+      --t:rgba(255,255,255,.5);--tb:rgba(255,255,255,.92);--td:rgba(255,255,255,.28);
+      --green:#34d399;--green-bg:rgba(52,211,153,.1);
+      --amber:#fbbf24;--amber-bg:rgba(251,191,36,.1);
+      --f:'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+      --m:'SF Mono','Fira Code','JetBrains Mono',monospace;
     }
+    html{font-size:16px;scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--t);font-family:var(--f);line-height:1.6;-webkit-font-smoothing:antialiased;min-height:100vh}
+    ::selection{background:rgba(255,255,255,.15);color:var(--tb)}
 
-    html { font-size: 16px; scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: var(--font);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      min-height: 100vh;
-    }
-
-    ::selection {
-      background: rgba(255,255,255,0.15);
-      color: var(--text-bright);
-    }
-
-    /* Layout */
-    .container {
-      width: 100%;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+    .w{width:100%;max-width:1100px;margin:0 auto;padding:0 32px}
 
     /* Nav */
-    nav {
-      padding: 20px 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .logo {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-    }
-    .nav-links { display: flex; gap: 20px; }
-    .nav-links a {
-      font-size: 13px;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .nav-links a:hover { color: var(--text); }
+    nav{padding:16px 0;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--td)}
+    .nav-links{display:flex;gap:18px}
+    .nav-links a{font-size:12px;color:var(--td);text-decoration:none;transition:color .2s}
+    .nav-links a:hover{color:var(--t)}
 
-    /* Hero */
-    .hero {
-      padding: 64px 0 40px;
-      text-align: left;
-    }
-    .hero h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      font-weight: 700;
-      letter-spacing: -0.035em;
-      line-height: 1.15;
-      color: var(--text-bright);
-      max-width: 600px;
-      margin-bottom: 20px;
-    }
-    .hero p {
-      font-size: clamp(0.9rem, 2vw, 1.05rem);
-      color: var(--text);
-      max-width: 480px;
-      line-height: 1.7;
-      margin-bottom: 28px;
-    }
-    .hero-metrics {
-      display: flex;
-      gap: 40px;
-    }
-    .metric-value {
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--text-bright);
-      letter-spacing: -0.02em;
-      line-height: 1;
-    }
-    .metric-label {
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-top: 6px;
-    }
+    /* Hero — side by side with metrics */
+    .hero{padding:48px 0 40px;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
+    .hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;letter-spacing:-.035em;line-height:1.12;color:var(--tb);max-width:560px;margin-bottom:12px}
+    .hero p{font-size:clamp(.85rem,1.5vw,.95rem);color:var(--t);max-width:440px;line-height:1.65}
+    .hero-metrics{display:flex;gap:32px}
+    .mv{font-size:24px;font-weight:700;color:var(--tb);letter-spacing:-.02em;line-height:1}
+    .ml{font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--td);margin-top:4px}
 
-    /* Products */
-    .section { padding: 48px 0; }
-    .section-header {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: 20px;
-    }
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-    .card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 22px;
-      text-decoration: none;
-      color: inherit;
-      display: flex;
-      flex-direction: column;
-      transition: background 0.25s, border-color 0.25s, transform 0.2s;
-    }
-    a.card:hover {
-      background: var(--bg-card-hover);
-      border-color: var(--border-hover);
-      transform: translateY(-2px);
-    }
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 16px;
-    }
-    .card-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      font-weight: 700;
-      color: #fff;
-    }
-    .badge {
-      font-size: 11px;
-      font-weight: 500;
-      padding: 3px 10px;
-      border-radius: 100px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .badge-live { background: var(--green-bg); color: var(--green); }
-    .badge-building { background: var(--amber-bg); color: var(--amber); }
-    .badge-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: currentColor;
-    }
-    .card-name {
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--text-bright);
-      margin-bottom: 6px;
-      letter-spacing: -0.01em;
-    }
-    .card-desc {
-      font-size: 14px;
-      color: var(--text);
-      line-height: 1.5;
-      flex: 1;
-    }
-    .card-stack {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-    }
-    .tech {
-      font-size: 11px;
-      font-family: var(--mono);
-      color: var(--text-dim);
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      padding: 2px 8px;
-      border-radius: 6px;
-    }
-    .card-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 13px;
-      color: var(--text-dim);
-      margin-top: 16px;
-      transition: color 0.2s;
-    }
-    a.card:hover .card-cta { color: var(--text-bright); }
-    .card-cta svg {
-      width: 14px; height: 14px;
-      transition: transform 0.2s;
-    }
-    a.card:hover .card-cta svg { transform: translateX(3px); }
+    /* Products — full width grid */
+    .sec{padding:32px 0}
+    .sh{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--td);margin-bottom:16px}
+    .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .card{background:var(--card);border:1px solid var(--b);border-radius:14px;padding:20px;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:background .25s,border-color .25s,transform .2s}
+    a.card:hover{background:var(--card-h);border-color:var(--bh);transform:translateY(-2px)}
+    .ct{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+    .ci{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+    .badge{font-size:10px;font-weight:500;padding:2px 8px;border-radius:100px;display:flex;align-items:center;gap:4px}
+    .bl{background:var(--green-bg);color:var(--green)}.bb{background:var(--amber-bg);color:var(--amber)}
+    .bd{width:4px;height:4px;border-radius:50%;background:currentColor}
+    .cn{font-size:15px;font-weight:600;color:var(--tb);margin-bottom:4px;letter-spacing:-.01em}
+    .cd{font-size:13px;color:var(--t);line-height:1.45;flex:1}
+    .cs{display:flex;gap:4px;flex-wrap:wrap;margin-top:12px}
+    .tech{font-size:10px;font-family:var(--m);color:var(--td);background:rgba(255,255,255,.03);border:1px solid var(--b);padding:1px 6px;border-radius:4px}
+    .cta{display:inline-flex;align-items:center;gap:3px;font-size:12px;color:var(--td);margin-top:12px;transition:color .2s}
+    a.card:hover .cta{color:var(--tb)}
+    .cta svg{width:12px;height:12px;transition:transform .2s}
+    a.card:hover .cta svg{transform:translateX(3px)}
 
-    /* About */
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      align-items: start;
-    }
-    .about-text h2 {
-      font-size: clamp(1.2rem, 3vw, 1.4rem);
-      font-weight: 700;
-      color: var(--text-bright);
-      letter-spacing: -0.025em;
-      line-height: 1.25;
-      margin-bottom: 12px;
-    }
-    .about-text p {
-      font-size: 13px;
-      color: var(--text);
-      line-height: 1.7;
-      margin-bottom: 10px;
-    }
-    .social-links {
-      display: flex;
-      gap: 8px;
-      margin-top: 16px;
-      flex-wrap: wrap;
-    }
-    .social-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text);
-      text-decoration: none;
-      padding: 6px 14px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      transition: border-color 0.2s, color 0.2s;
-    }
-    .social-link:hover {
-      border-color: var(--border-hover);
-      color: var(--text-bright);
-    }
-    .social-link svg { width: 14px; height: 14px; }
-
-    /* Stack */
-    .stack-grid {
-      display: grid;
-      gap: 20px;
-    }
-    .stack-cat-label {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-dim);
-      margin-bottom: 8px;
-    }
-    .stack-items {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-    .stack-tag {
-      font-size: 12px;
-      font-family: var(--mono);
-      color: var(--text);
-      background: rgba(255,255,255,0.04);
-      padding: 4px 10px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
-    }
+    /* About — 3 columns */
+    .about-grid{display:grid;grid-template-columns:1.2fr .8fr .8fr;gap:32px;align-items:start}
+    .about-grid h2{font-size:clamp(1.1rem,2vw,1.3rem);font-weight:700;color:var(--tb);letter-spacing:-.02em;line-height:1.25;margin-bottom:10px}
+    .about-grid p{font-size:13px;color:var(--t);line-height:1.65;margin-bottom:8px}
+    .slinks{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap}
+    .sl{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--t);text-decoration:none;padding:5px 11px;border:1px solid var(--b);border-radius:7px;transition:border-color .2s,color .2s}
+    .sl:hover{border-color:var(--bh);color:var(--tb)}
+    .sl svg{width:13px;height:13px}
+    .scl{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--td);margin-bottom:6px}
+    .sci{display:flex;gap:5px;flex-wrap:wrap}
+    .st{font-size:11px;font-family:var(--m);color:var(--t);background:rgba(255,255,255,.03);padding:3px 8px;border-radius:5px;border:1px solid var(--b)}
+    .stack-col{display:flex;flex-direction:column;gap:14px}
 
     /* Footer */
-    footer {
-      padding: 32px 0;
-      border-top: 1px solid var(--border);
-    }
-    .footer-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .footer-tag {
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-    .footer-tag span { color: var(--text); }
-    .footer-links { display: flex; gap: 20px; }
-    .footer-links a {
-      font-size: 12px;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-links a:hover { color: var(--text); }
-    .footer-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .footer-copy { font-size: 11px; color: var(--text-dim); }
-    .footer-legal { display: flex; gap: 20px; }
-    .footer-legal a {
-      font-size: 11px;
-      color: var(--text-dim);
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .footer-legal a:hover { color: var(--text); }
+    footer{padding:24px 0;border-top:1px solid var(--b)}
+    .fr{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+    .ft{font-size:11px;color:var(--td)}.ft span{color:var(--t)}
+    .fl{display:flex;gap:16px}
+    .fl a{font-size:11px;color:var(--td);text-decoration:none;transition:color .2s}
+    .fl a:hover{color:var(--t)}
+    .fb{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--b);flex-wrap:wrap;gap:10px}
+    .fc{font-size:10px;color:var(--td)}
 
-    /* Fade in */
-    .fade{opacity:0;transform:translateY(14px);transition:opacity 0.5s ease,transform 0.5s ease}
+    /* Fade */
+    .fade{opacity:0;transform:translateY(10px);transition:opacity .45s ease,transform .45s ease}
     .fade.show{opacity:1;transform:translateY(0)}
 
-    /* ——— Responsive ——— */
-
-    /* Tablet */
-    @media (max-width: 768px) {
-      .hero { padding: 56px 0 40px; }
-      .hero-metrics { gap: 28px; }
-      .product-grid { gap: 12px; }
-      .card { padding: 18px; }
-      .about-grid { grid-template-columns: 1fr; gap: 24px; }
-      .section { padding: 40px 0; }
+    /* Responsive */
+    @media(max-width:900px){
+      .pgrid{grid-template-columns:repeat(2,1fr)}
+      .about-grid{grid-template-columns:1fr 1fr}
     }
-
-    /* Mobile */
-    @media (max-width: 540px) {
-      .container { padding: 0 16px; }
-      .hero { padding: 60px 0 48px; }
-      .hero h1 { font-size: 1.75rem; }
-      .hero p { font-size: 0.88rem; }
-      .hero-metrics { gap: 20px; }
-      .metric-value { font-size: 22px; }
-      .product-grid { grid-template-columns: 1fr; gap: 12px; }
-      .card { padding: 20px; }
-      .card-name { font-size: 15px; }
-      .card-desc { font-size: 13px; }
-      .about-grid { gap: 24px; }
-      .social-links { gap: 6px; }
-      .social-link { font-size: 12px; padding: 5px 10px; }
-      .footer-row { flex-direction: column; align-items: flex-start; }
-      .nav-links { gap: 14px; }
-      .nav-links a { font-size: 12px; }
-    }
-
-    /* Very small */
-    @media (max-width: 360px) {
-      .hero h1 { font-size: 1.5rem; }
-      .hero-metrics { flex-wrap: wrap; gap: 16px; }
-      .card { padding: 16px; border-radius: 12px; }
+    @media(max-width:600px){
+      .w{padding:0 16px}
+      .hero{grid-template-columns:1fr;gap:20px;padding:36px 0 28px}
+      .pgrid{grid-template-columns:1fr}
+      .about-grid{grid-template-columns:1fr}
+      .hero h1{font-size:1.5rem}
+      .hero-metrics{gap:20px}
+      .mv{font-size:20px}
+      .card{padding:16px}
+      .fr{flex-direction:column;align-items:flex-start}
+      .nav-links{gap:12px}
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <div class="w">
 
     <nav>
       <div class="logo">Kyren</div>
@@ -411,159 +130,85 @@
     </nav>
 
     <section class="hero fade">
-      <h1>A small studio building focused tools for everyday life.</h1>
-      <p>Each product solves one problem well. Nothing more, nothing less. Built in Tokyo with care.</p>
+      <div>
+        <h1>A small studio building focused tools for everyday life.</h1>
+        <p>Each product solves one problem well. Nothing more, nothing less. Built in Tokyo with care.</p>
+      </div>
       <div class="hero-metrics">
-        <div>
-          <div class="metric-value">4</div>
-          <div class="metric-label">Products</div>
-        </div>
-        <div>
-          <div class="metric-value">3</div>
-          <div class="metric-label">Live</div>
-        </div>
-        <div>
-          <div class="metric-value">1</div>
-          <div class="metric-label">Engineer</div>
-        </div>
+        <div><div class="mv">4</div><div class="ml">Products</div></div>
+        <div><div class="mv">3</div><div class="ml">Live</div></div>
+        <div><div class="mv">1</div><div class="ml">Engineer</div></div>
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-header fade">Products</div>
-      <div class="product-grid">
-
+    <section class="sec">
+      <div class="sh fade">Products</div>
+      <div class="pgrid">
         <a href="https://kashite.kyren.app" class="card fade" target="_blank" rel="noopener">
-          <div class="card-top">
-            <div class="card-icon" style="background:#E85D3A">K</div>
-            <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
-          </div>
-          <div class="card-name">KASHITE</div>
-          <div class="card-desc">Track who borrowed what. Get it back.</div>
-          <div class="card-stack">
-            <span class="tech">Next.js</span>
-            <span class="tech">Supabase</span>
-            <span class="tech">Stripe</span>
-          </div>
-          <div class="card-cta">Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+          <div class="ct"><div class="ci" style="background:#E85D3A">K</div><span class="badge bl"><span class="bd"></span>Live</span></div>
+          <div class="cn">KASHITE</div>
+          <div class="cd">Track who borrowed what. Get it back.</div>
+          <div class="cs"><span class="tech">Next.js</span><span class="tech">Supabase</span><span class="tech">Stripe</span></div>
+          <div class="cta">Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
         </a>
-
         <a href="https://yomu.kyren.app" class="card fade" target="_blank" rel="noopener">
-          <div class="card-top">
-            <div class="card-icon" style="background:#5B8DEF">Y</div>
-            <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
-          </div>
-          <div class="card-name">YOMU</div>
-          <div class="card-desc">AI reading assistant. Upload, ask, learn.</div>
-          <div class="card-stack">
-            <span class="tech">Next.js</span>
-            <span class="tech">Supabase</span>
-            <span class="tech">Claude API</span>
-          </div>
-          <div class="card-cta">Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+          <div class="ct"><div class="ci" style="background:#5B8DEF">Y</div><span class="badge bl"><span class="bd"></span>Live</span></div>
+          <div class="cn">YOMU</div>
+          <div class="cd">AI reading assistant. Upload, ask, learn.</div>
+          <div class="cs"><span class="tech">Next.js</span><span class="tech">Supabase</span><span class="tech">Claude API</span></div>
+          <div class="cta">Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
         </a>
-
         <a href="https://phrasely.kyren.app" class="card fade" target="_blank" rel="noopener">
-          <div class="card-top">
-            <div class="card-icon" style="background:#4CAF82">P</div>
-            <span class="badge badge-live"><span class="badge-dot"></span>Live</span>
-          </div>
-          <div class="card-name">Phrasely</div>
-          <div class="card-desc">Write better English. Learn why it works.</div>
-          <div class="card-stack">
-            <span class="tech">Next.js</span>
-            <span class="tech">Supabase</span>
-            <span class="tech">Claude API</span>
-          </div>
-          <div class="card-cta">Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
+          <div class="ct"><div class="ci" style="background:#4CAF82">P</div><span class="badge bl"><span class="bd"></span>Live</span></div>
+          <div class="cn">Phrasely</div>
+          <div class="cd">Write better English. Learn why it works.</div>
+          <div class="cs"><span class="tech">Next.js</span><span class="tech">Supabase</span><span class="tech">Claude API</span></div>
+          <div class="cta">Try it <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8h10M9 4l4 4-4 4"/></svg></div>
         </a>
-
         <div class="card fade">
-          <div class="card-top">
-            <div class="card-icon" style="background:#D4A853">S</div>
-            <span class="badge badge-building"><span class="badge-dot"></span>Building</span>
-          </div>
-          <div class="card-name">SABAKU</div>
-          <div class="card-desc">Task management inspired by air traffic control strips.</div>
-          <div class="card-stack">
-            <span class="tech">Next.js</span>
-            <span class="tech">Supabase</span>
-            <span class="tech">DnD Kit</span>
-          </div>
+          <div class="ct"><div class="ci" style="background:#D4A853">S</div><span class="badge bb"><span class="bd"></span>Building</span></div>
+          <div class="cn">SABAKU</div>
+          <div class="cd">ATC-inspired task management. Visual, spatial.</div>
+          <div class="cs"><span class="tech">Next.js</span><span class="tech">Supabase</span><span class="tech">DnD Kit</span></div>
         </div>
-
       </div>
     </section>
 
-    <section class="section" style="border-top:1px solid var(--border)">
+    <section class="sec" style="border-top:1px solid var(--b)">
       <div class="about-grid fade">
-        <div class="about-text">
+        <div>
           <h2>One engineer, building from Tokyo.</h2>
           <p>Kyren follows Kanso — the Japanese principle of simplicity. Strip away the unnecessary. Every tool does one thing well.</p>
           <p>No investor decks. No feature bloat. Just tools that solve real problems.</p>
-          <div class="social-links">
-            <a href="https://github.com/masatonaut" class="social-link" target="_blank" rel="noopener">
-              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-              GitHub
-            </a>
-            <a href="https://x.com/masatobuilds" class="social-link" target="_blank" rel="noopener">
-              <svg viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>
-              X
-            </a>
-            <a href="https://masatonaut.dev" class="social-link" target="_blank" rel="noopener">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-1.5 2-2.5 4-2.5 6.5s1 4.5 2.5 6.5c1.5-2 2.5-4 2.5-6.5s-1-4.5-2.5-6.5"/></svg>
-              Portfolio
-            </a>
+          <div class="slinks">
+            <a href="https://github.com/masatonaut" class="sl" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>GitHub</a>
+            <a href="https://x.com/masatobuilds" class="sl" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"/></svg>X</a>
+            <a href="https://masatonaut.dev" class="sl" target="_blank" rel="noopener"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="6.5"/><path d="M1.5 8h13M8 1.5c-1.5 2-2.5 4-2.5 6.5s1 4.5 2.5 6.5c1.5-2 2.5-4 2.5-6.5s-1-4.5-2.5-6.5"/></svg>Portfolio</a>
           </div>
         </div>
-        <div class="stack-grid">
-          <div>
-            <div class="stack-cat-label">Frontend</div>
-            <div class="stack-items">
-              <span class="stack-tag">Next.js</span>
-              <span class="stack-tag">React</span>
-              <span class="stack-tag">TypeScript</span>
-              <span class="stack-tag">Tailwind</span>
-            </div>
-          </div>
-          <div>
-            <div class="stack-cat-label">Backend</div>
-            <div class="stack-items">
-              <span class="stack-tag">Supabase</span>
-              <span class="stack-tag">PostgreSQL</span>
-              <span class="stack-tag">Stripe</span>
-            </div>
-          </div>
-          <div>
-            <div class="stack-cat-label">AI</div>
-            <div class="stack-items">
-              <span class="stack-tag">Claude API</span>
-              <span class="stack-tag">RAG</span>
-            </div>
-          </div>
-          <div>
-            <div class="stack-cat-label">Infra</div>
-            <div class="stack-items">
-              <span class="stack-tag">Vercel</span>
-              <span class="stack-tag">GitHub Actions</span>
-            </div>
-          </div>
+        <div class="stack-col">
+          <div><div class="scl">Frontend</div><div class="sci"><span class="st">Next.js</span><span class="st">React</span><span class="st">TypeScript</span><span class="st">Tailwind</span></div></div>
+          <div><div class="scl">Backend</div><div class="sci"><span class="st">Supabase</span><span class="st">PostgreSQL</span><span class="st">Stripe</span></div></div>
+        </div>
+        <div class="stack-col">
+          <div><div class="scl">AI</div><div class="sci"><span class="st">Claude API</span><span class="st">RAG</span></div></div>
+          <div><div class="scl">Infra</div><div class="sci"><span class="st">Vercel</span><span class="st">GitHub Actions</span></div></div>
         </div>
       </div>
     </section>
 
     <footer>
-      <div class="footer-row">
-        <div class="footer-tag">Built with <span>Next.js + Supabase</span>. Designed in Tokyo.</div>
-        <div class="footer-links">
+      <div class="fr">
+        <div class="ft">Built with <span>Next.js + Supabase</span>. Designed in Tokyo.</div>
+        <div class="fl">
           <a href="https://github.com/masatonaut" target="_blank" rel="noopener">GitHub</a>
           <a href="https://x.com/masatobuilds" target="_blank" rel="noopener">X</a>
           <a href="mailto:hey@kyren.app">Contact</a>
         </div>
       </div>
-      <div class="footer-bottom">
-        <span class="footer-copy">&copy; 2026 Kyren</span>
-        <div class="footer-legal">
+      <div class="fb">
+        <span class="fc">&copy; 2026 Kyren</span>
+        <div class="fl">
           <a href="/terms">Terms</a>
           <a href="/privacy">Privacy</a>
           <a href="/tokushoho">Tokushoho</a>
@@ -572,12 +217,9 @@
     </footer>
 
   </div>
-
   <script>
-    const io = new IntersectionObserver(es => {
-      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('show'); io.unobserve(e.target); }});
-    }, { threshold: 0.08 });
-    document.querySelectorAll('.fade').forEach(el => io.observe(el));
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}})},{threshold:.08});
+    document.querySelectorAll('.fade').forEach(el=>io.observe(el));
   </script>
 </body>
 </html>
