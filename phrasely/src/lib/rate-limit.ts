@@ -108,3 +108,20 @@ export async function getDailyUsage(ipHash: string) {
     remaining: Math.max(0, LIMITS.FREE_DAILY_REWRITES - used),
   };
 }
+
+export async function isProUser(email: string): Promise<boolean> {
+  if (!email) return false;
+  const supabase = getSupabase();
+  const { data } = await supabase
+    .from("subscribers")
+    .select("status, current_period_end")
+    .eq("email", email.toLowerCase())
+    .eq("status", "active")
+    .single();
+
+  if (!data) return false;
+  if (data.current_period_end) {
+    return new Date(data.current_period_end) > new Date();
+  }
+  return true;
+}

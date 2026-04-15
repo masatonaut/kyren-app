@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { LIMITS } from "@/lib/config";
-import { getClientIP, hashIP, checkRateLimit, recordUsage } from "@/lib/rate-limit";
+import { getClientIP, hashIP, checkRateLimit, recordUsage, isProUser } from "@/lib/rate-limit";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -53,42 +53,52 @@ export async function POST(request: Request) {
       );
     }
 
-    // Rate limiting
+    const { text, targetStyle, proEmail } = await request.json();
+
+    // Check Pro status
+    const isPro = proEmail ? await isProUser(proEmail) : false;
+
+    // Rate limiting (Pro users skip daily limit, but still have burst protection)
     const clientIP = getClientIP(request);
     const ipHash = hashIP(clientIP);
     const rateLimit = await checkRateLimit(ipHash);
 
     if (!rateLimit.allowed) {
-      const message =
-        rateLimit.reason === "burst"
-          ? "Too many requests. Please wait a moment."
-          : "Daily free limit reached. Upgrade to Pro for unlimited rewrites.";
-      const res = NextResponse.json(
-        {
-          error: message,
-          usage: {
-            used: rateLimit.dailyUsed,
-            limit: rateLimit.dailyLimit,
-            remaining: rateLimit.remaining,
+      // Pro users only blocked by burst, not daily limit
+      if (isPro && rateLimit.reason === "daily_limit") {
+        // Allow Pro users through
+      } else {
+        const message =
+          rateLimit.reason === "burst"
+            ? "Too many requests. Please wait a moment."
+            : "Daily free limit reached. Upgrade to Pro for unlimited rewrites.";
+        const res = NextResponse.json(
+          {
+            error: message,
+            usage: {
+              used: rateLimit.dailyUsed,
+              limit: rateLimit.dailyLimit,
+              remaining: rateLimit.remaining,
+              isPro: false,
+            },
           },
-        },
-        { status: 429 }
-      );
-      if (rateLimit.retryAfter) {
-        res.headers.set("Retry-After", String(rateLimit.retryAfter));
+          { status: 429 }
+        );
+        if (rateLimit.retryAfter) {
+          res.headers.set("Retry-After", String(rateLimit.retryAfter));
+        }
+        return res;
       }
-      return res;
     }
-
-    const { text, targetStyle } = await request.json();
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
-    if (text.length > LIMITS.FREE_MAX_CHARS) {
+    const maxChars = isPro ? LIMITS.PRO_MAX_CHARS : LIMITS.FREE_MAX_CHARS;
+    if (text.length > maxChars) {
       return NextResponse.json(
-        { error: `Text exceeds ${LIMITS.FREE_MAX_CHARS} character limit (Free tier)` },
+        { error: `Text exceeds ${maxChars} character limit${isPro ? "" : " (Free tier)"}` },
         { status: 400 }
       );
     }
@@ -144,9 +154,10 @@ ${text}`;
     return NextResponse.json({
       ...result,
       usage: {
-        used: rateLimit.dailyUsed + 1,
-        limit: rateLimit.dailyLimit,
-        remaining: rateLimit.remaining - 1,
+        used: isPro ? 0 : rateLimit.dailyUsed + 1,
+        limit: isPro ? -1 : rateLimit.dailyLimit,
+        remaining: isPro ? -1 : rateLimit.remaining - 1,
+        isPro,
       },
     });
   } catch (error: unknown) {

@@ -2,9 +2,23 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function Header() {
   const pathname = usePathname();
+  const [isPro, setIsPro] = useState(false);
+
+  useEffect(() => {
+    const email = localStorage.getItem("phrasely_pro_email");
+    if (email) {
+      fetch(`/api/usage?email=${encodeURIComponent(email)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.isPro) setIsPro(true);
+        })
+        .catch(() => {});
+    }
+  }, []);
 
   const scrollToDemo = () => {
     const demoSection = document.getElementById("rewrite-demo");
@@ -44,21 +58,28 @@ export default function Header() {
             ))}
           </nav>
         </div>
-        {pathname === "/" ? (
-          <button
-            onClick={scrollToDemo}
-            className="px-4 py-2 bg-[var(--accent)] text-white font-medium rounded-lg hover:bg-[var(--accent)]/90 transition cursor-pointer text-sm"
-          >
-            Try Free
-          </button>
-        ) : (
-          <Link
-            href="/"
-            className="px-4 py-2 bg-[var(--accent)] text-white font-medium rounded-lg hover:bg-[var(--accent)]/90 transition text-sm"
-          >
-            Try Rewrite
-          </Link>
-        )}
+        <div className="flex items-center gap-3">
+          {isPro && (
+            <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-[var(--accent)]/20 text-[var(--accent)] border border-[var(--accent)]/30">
+              Pro
+            </span>
+          )}
+          {pathname === "/" ? (
+            <button
+              onClick={scrollToDemo}
+              className="px-4 py-2 bg-[var(--accent)] text-white font-medium rounded-lg hover:bg-[var(--accent)]/90 transition cursor-pointer text-sm"
+            >
+              Try Free
+            </button>
+          ) : (
+            <Link
+              href="/"
+              className="px-4 py-2 bg-[var(--accent)] text-white font-medium rounded-lg hover:bg-[var(--accent)]/90 transition text-sm"
+            >
+              Try Rewrite
+            </Link>
+          )}
+        </div>
       </div>
     </header>
   );
