@@ -5,6 +5,13 @@ import type { Strip, StripStatus, StripPriority, StripCategory } from '@/types'
 
 let stripCounter = 0
 
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`
+}
+
 function createStrip(
   title: string,
   priority: StripPriority = 'nrm',
@@ -15,7 +22,7 @@ function createStrip(
 ): Strip {
   stripCounter++
   return {
-    id: crypto.randomUUID(),
+    id: generateId(),
     user_id: 'local',
     title,
     status: 'queue',
