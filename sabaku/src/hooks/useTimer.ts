@@ -11,25 +11,32 @@ export function useTimer({ initialSeconds = 0, onTick }: UseTimerOptions = {}) {
   const [seconds, setSeconds] = useState(initialSeconds)
   const [isRunning, setIsRunning] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startTimeRef = useRef<number>(0)
+  const accumulatedRef = useRef(initialSeconds)
   const onTickRef = useRef(onTick)
   onTickRef.current = onTick
 
   useEffect(() => {
     setSeconds(initialSeconds)
+    accumulatedRef.current = initialSeconds
   }, [initialSeconds])
 
   useEffect(() => {
     if (isRunning) {
+      startTimeRef.current = Date.now()
       intervalRef.current = setInterval(() => {
-        setSeconds(prev => {
-          const next = prev + 1
-          onTickRef.current?.(next)
-          return next
-        })
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
+        const total = accumulatedRef.current + elapsed
+        setSeconds(total)
+        onTickRef.current?.(total)
       }, 1000)
-    } else if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-      intervalRef.current = null
+    } else {
+      if (intervalRef.current) {
+        const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000)
+        accumulatedRef.current += elapsed
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
+      }
     }
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
@@ -41,6 +48,7 @@ export function useTimer({ initialSeconds = 0, onTick }: UseTimerOptions = {}) {
   const toggle = useCallback(() => setIsRunning(prev => !prev), [])
   const reset = useCallback(() => {
     setIsRunning(false)
+    accumulatedRef.current = initialSeconds
     setSeconds(initialSeconds)
   }, [initialSeconds])
 

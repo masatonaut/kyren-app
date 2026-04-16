@@ -432,7 +432,7 @@ export default function Home() {
             <button
               key={style.value}
               onClick={() => setTargetStyle(style.value)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+              className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                 targetStyle === style.value
                   ? "bg-[var(--accent)] text-white"
                   : "bg-[var(--card)] text-[var(--muted)] hover:bg-[var(--card-hover)]"
@@ -455,7 +455,7 @@ export default function Home() {
           {inputText && (
             <button
               onClick={handleClear}
-              className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center rounded-full bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer text-sm"
+              className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer text-sm"
               title="Clear"
             >
               {"\u00D7"}
@@ -536,14 +536,14 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => speak(result.rewritten)}
-                    className="px-2 py-1 text-xs font-medium rounded bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
+                    className="px-3 py-2 min-h-[36px] text-xs font-medium rounded bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
                     title="Listen to pronunciation"
                   >
                     {"\u{1F50A}"}
                   </button>
                   <button
                     onClick={handleCopy}
-                    className="px-3 py-1 text-xs font-medium rounded bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer min-w-[70px]"
+                    className="px-3 py-2 min-h-[36px] text-xs font-medium rounded bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer min-w-[70px]"
                   >
                     {copied ? (
                       <span className="text-[var(--success)]">
@@ -567,7 +567,7 @@ export default function Home() {
                   </h3>
                   <button
                     onClick={() => setShowJapanese(!showJapanese)}
-                    className={`px-3 py-1 text-xs font-medium rounded transition cursor-pointer ${
+                    className={`px-3 py-2 min-h-[36px] text-xs font-medium rounded transition cursor-pointer ${
                       showJapanese
                         ? "bg-[var(--accent)] text-white"
                         : "bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)]"
@@ -596,7 +596,7 @@ export default function Home() {
                         </span>
                         <button
                           onClick={() => speak(change.replacement)}
-                          className="px-1.5 py-0.5 text-xs rounded bg-[var(--card)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
+                          className="px-2.5 py-1.5 min-h-[32px] text-xs rounded bg-[var(--card)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
                           title="Listen"
                         >
                           {"\u{1F50A}"}
@@ -725,14 +725,14 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-8 text-[var(--muted)] text-sm border-t border-[var(--border)]">
         <div className="max-w-5xl mx-auto px-6">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8">
             <a
               href="/privacy"
               className="hover:text-[var(--accent)] transition"
             >
               Privacy
             </a>
-            <a href="/terms" className="hover:text-[var(--accent)] transition">
+            <a href="/terms" className="py-2 hover:text-[var(--accent)] transition">
               Terms
             </a>
             <span className="order-first sm:order-none">

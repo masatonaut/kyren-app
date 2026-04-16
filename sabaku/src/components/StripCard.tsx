@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import type { Strip } from '@/types'
 import { formatTimer, generateStripId, cn } from '@/lib/utils'
 import { Timer, Link2, Pencil } from 'lucide-react'
@@ -37,7 +38,7 @@ const categoryLabels: Record<string, string> = {
   'manual': 'manual',
 }
 
-export default function StripCard({ strip, displayIndex, isSelected, showTimer, compact }: StripCardProps) {
+function StripCard({ strip, displayIndex, isSelected, showTimer, compact }: StripCardProps) {
   const priority = priorityStyles[strip.priority]
   const isCleared = strip.status === 'cleared'
   const isActive = strip.status === 'active'
@@ -67,7 +68,7 @@ export default function StripCard({ strip, displayIndex, isSelected, showTimer, 
         <span className={cn(
           'text-[15px] truncate flex-1 min-w-0',
           isCleared && 'line-through text-text-tertiary',
-        )}>
+        )} title={strip.title}>
           {strip.title}
         </span>
 
@@ -127,3 +128,5 @@ export default function StripCard({ strip, displayIndex, isSelected, showTimer, 
     </div>
   )
 }
+
+export default memo(StripCard)

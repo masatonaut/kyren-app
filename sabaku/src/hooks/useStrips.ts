@@ -1,7 +1,23 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import type { Strip, StripStatus, StripPriority, StripCategory } from '@/types'
+
+const STORAGE_KEY = 'sabaku-strips'
+
+function loadStrips(): Strip[] | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) return JSON.parse(raw) as Strip[]
+  } catch { /* ignore */ }
+  return null
+}
+
+function saveStrips(strips: Strip[]) {
+  if (typeof window === 'undefined') return
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(strips)) } catch { /* ignore */ }
+}
 
 let stripCounter = 0
 
@@ -53,7 +69,9 @@ function getDemoStrips(): Strip[] {
 }
 
 export function useStrips() {
-  const [strips, setStrips] = useState<Strip[]>(getDemoStrips)
+  const [strips, setStrips] = useState<Strip[]>(() => loadStrips() ?? getDemoStrips())
+
+  useEffect(() => { saveStrips(strips) }, [strips])
 
   const activeStrip = strips.find(s => s.status === 'active') ?? null
   const queueStrips = strips
