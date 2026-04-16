@@ -46,11 +46,11 @@ export default function NewStripModal({ isOpen, onClose, onSubmit, projects }: N
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="new-strip-title">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
       <div className="relative bg-bg-secondary border border-border rounded-lg w-full max-w-md p-6 shadow-2xl animate-fade-in">
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-[15px] font-medium">New Strip</h2>
+          <h2 id="new-strip-title" className="text-[15px] font-medium">New Strip</h2>
           <button onClick={onClose} className="text-text-tertiary hover:text-text-primary transition-colors">
             <X size={18} />
           </button>

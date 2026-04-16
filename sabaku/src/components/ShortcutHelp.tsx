@@ -25,12 +25,12 @@ export default function ShortcutHelp({ isOpen, onClose }: ShortcutHelpProps) {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className="relative bg-bg-secondary border border-border rounded-lg w-full max-w-sm p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} aria-hidden="true" />
+      <div className="relative bg-bg-secondary border border-border rounded-lg w-full max-w-sm p-5 shadow-2xl animate-fade-in">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-[15px] font-medium">Keyboard Shortcuts</h2>
-          <button onClick={onClose} className="text-text-tertiary hover:text-text-primary transition-colors">
+          <h2 id="shortcuts-title" className="text-[15px] font-medium">Keyboard Shortcuts</h2>
+          <button onClick={onClose} className="text-text-tertiary hover:text-text-primary transition-colors" aria-label="Close">
             <X size={18} />
           </button>
         </div>

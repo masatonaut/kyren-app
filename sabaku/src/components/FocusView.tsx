@@ -75,7 +75,7 @@ export default function FocusView({
       </div>
 
       {/* Title */}
-      <h1 className="text-2xl font-medium text-center leading-snug">
+      <h1 className="text-2xl font-medium text-center leading-snug max-w-full break-words">
         {activeStrip.title}
       </h1>
 

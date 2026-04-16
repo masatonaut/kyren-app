@@ -110,12 +110,14 @@ export default function Header({ viewMode, onViewChange, onNewStrip, onShowHelp,
           onClick={onShowHelp}
           className="p-2 text-text-tertiary hover:text-text-secondary transition-colors"
           title="Keyboard shortcuts (?)"
+          aria-label="Keyboard shortcuts"
         >
           <Keyboard size={16} />
         </button>
         <button
           onClick={onNewStrip}
           className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-accent text-white rounded hover:bg-accent-hover transition-colors"
+          aria-label="Create new strip"
         >
           <Plus size={14} />
           New

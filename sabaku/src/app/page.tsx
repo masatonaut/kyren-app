@@ -80,6 +80,7 @@ export default function Home() {
   }, [helpOpen, newStripOpen])
 
   const handleCycleProject = useCallback(() => {
+    setSelectedQueueIndex(0)
     setSelectedProject(prev => {
       if (prev === null) return projects[0] ?? null
       const idx = projects.indexOf(prev)
@@ -113,7 +114,7 @@ export default function Home() {
         onShowHelp={() => setHelpOpen(true)}
         projects={projects}
         selectedProject={selectedProject}
-        onProjectChange={setSelectedProject}
+        onProjectChange={(p) => { setSelectedProject(p); setSelectedQueueIndex(0) }}
       />
 
       <main className="flex-1 p-4 overflow-hidden">
