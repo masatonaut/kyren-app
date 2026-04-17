@@ -68,6 +68,15 @@ const STYLE_OPTIONS = [
 
 type StyleValue = (typeof STYLE_OPTIONS)[number]["value"];
 
+// Detect input language by checking for Japanese characters (hiragana/katakana/kanji)
+const detectLanguage = (text: string): "ja" | "en" | "unknown" => {
+  const trimmed = text.trim();
+  if (trimmed.length < 2) return "unknown";
+  // Hiragana: U+3040-U+309F, Katakana: U+30A0-U+30FF, CJK: U+4E00-U+9FFF
+  const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]/.test(trimmed);
+  return hasJapanese ? "ja" : "en";
+};
+
 // Speech synthesis helper
 const speak = (text: string) => {
   if (typeof window !== "undefined" && window.speechSynthesis) {
@@ -126,6 +135,7 @@ export default function Home() {
   );
   const [targetStyle, setTargetStyle] = useState<StyleValue>("casual");
   const [showJapanese, setShowJapanese] = useState(false);
+  const inputLang = detectLanguage(inputText);
   const [isPro, setIsPro] = useState(false);
   const [proEmail, setProEmail] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -422,26 +432,40 @@ export default function Home() {
 
       {/* Smart Rewrite Demo */}
       <section id="rewrite-demo" className="max-w-4xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold text-[var(--foreground)] text-center mb-6">
+        <h2 className="text-2xl font-bold text-[var(--foreground)] text-center mb-2">
           Try Smart Rewrite
         </h2>
+        <p className="text-sm text-[var(--muted)] text-center mb-6">
+          {
+            "\u82F1\u8A9E\u3092\u306A\u3081\u3089\u304B\u306B\u3001\u307E\u305F\u306F\u65E5\u672C\u8A9E\u304B\u3089\u81EA\u7136\u306A\u82F1\u8A9E\u3078"
+          }
+          <span className="mx-2 text-[var(--border)]">{"\u2022"}</span>
+          Polish your English, or turn Japanese into natural English
+        </p>
 
         {/* Style Selector */}
-        <div className="flex flex-wrap justify-center gap-2 mb-4 overflow-x-auto pb-2 -mx-2 px-2">
-          {STYLE_OPTIONS.map((style) => (
-            <button
-              key={style.value}
-              onClick={() => setTargetStyle(style.value)}
-              className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
-                targetStyle === style.value
-                  ? "bg-[var(--accent)] text-white"
-                  : "bg-[var(--card)] text-[var(--muted)] hover:bg-[var(--card-hover)]"
-              }`}
-            >
-              <span>{style.icon}</span>
-              <span>{style.label}</span>
-            </button>
-          ))}
+        <div className="mb-3">
+          <p className="text-xs text-[var(--muted)] text-center mb-2">
+            {inputLang === "ja"
+              ? "\u7FFB\u8A33\u5148\u306E\u30C8\u30FC\u30F3\u3092\u9078\u3076"
+              : "Choose a target tone"}
+          </p>
+          <div className="flex flex-wrap justify-center gap-2 overflow-x-auto pb-2 -mx-2 px-2">
+            {STYLE_OPTIONS.map((style) => (
+              <button
+                key={style.value}
+                onClick={() => setTargetStyle(style.value)}
+                className={`px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                  targetStyle === style.value
+                    ? "bg-[var(--accent)] text-white"
+                    : "bg-[var(--card)] text-[var(--muted)] hover:bg-[var(--card-hover)]"
+                }`}
+              >
+                <span>{style.icon}</span>
+                <span>{style.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Input */}
@@ -449,7 +473,9 @@ export default function Home() {
           <textarea
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Paste your text here... (English or Japanese)"
+            placeholder={
+              "Paste English here, or type in Japanese...\n\u82F1\u8A9E\u3092\u8CBC\u308B\u304B\u3001\u65E5\u672C\u8A9E\u3067\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044"
+            }
             className="w-full min-h-[160px] px-4 py-3 pr-10 rounded-lg bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] placeholder-[var(--muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
           />
           {inputText && (
@@ -465,6 +491,27 @@ export default function Home() {
             {inputText.length} / {isPro ? LIMITS.PRO_MAX_CHARS : LIMITS.FREE_MAX_CHARS}
           </span>
         </div>
+
+        {/* Language detection badge */}
+        {inputLang !== "unknown" && (
+          <div className="mt-2 flex items-center justify-center gap-2 text-xs">
+            {inputLang === "ja" ? (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                <span>{"\u{1F1EF}\u{1F1F5}"}</span>
+                <span>
+                  {
+                    "\u65E5\u672C\u8A9E\u3092\u691C\u51FA \u2192 \u81EA\u7136\u306A\u82F1\u8A9E\u306B\u7FFB\u8A33\u3057\u307E\u3059"
+                  }
+                </span>
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                <span>{"\u{1F1EC}\u{1F1E7}"}</span>
+                <span>English detected → rewriting in a natural tone</span>
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mt-3">
           <span className="text-sm text-[var(--muted)]">
