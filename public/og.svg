@@ -1,0 +1,8 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#09090b"/>
+  <text x="100" y="240" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="300" fill="#fafafa" letter-spacing="-1">Kyren</text>
+  <text x="100" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#a1a1aa" letter-spacing="0">A small studio building focused tools</text>
+  <text x="100" y="360" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#a1a1aa" letter-spacing="0">for everyday life.</text>
+  <text x="100" y="440" font-family="monospace" font-size="16" fill="#52525b">KASHITE  ·  YOMU  ·  Phrasely  ·  SABAKU</text>
+  <text x="100" y="530" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#52525b">kyren.app</text>
+</svg>

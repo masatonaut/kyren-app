@@ -1,11 +1,12 @@
 .vercel
 .DS_Store
 node_modules/
+dist/
 .next/
 .env.local
 .env
 *.tsbuildinfo
-og.svg
+/og.svg
 
 # Subprojects managed separately
 phrasely/

@@ -1,12 +1,4 @@
-import { useEffect, useRef } from 'react'
-import {
-  motion,
-  useInView,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-  type Variants,
-} from 'motion/react'
+import { motion, type Variants } from 'motion/react'
 
 // --- Shared motion settings ---
 const fadeUp: Variants = {
@@ -15,59 +7,49 @@ const fadeUp: Variants = {
 }
 
 const gridContainer: Variants = {
-  hidden: {},
+  hidden: { opacity: 1 },
   show: {
+    opacity: 1,
     transition: { staggerChildren: 0.08, delayChildren: 0.05 },
   },
 }
 
-// --- Hero metric with animated count-up ---
-function CountMetric({ value, label }: { value: number; label: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  const inView = useInView(ref, { once: true, amount: 0.6 })
-  const reduceMotion = useReducedMotion()
-
-  const count = useSpring(0, { stiffness: 80, damping: 20, mass: 0.8 })
-  const rounded = useTransform(count, (v) => Math.round(v).toString())
-
-  useEffect(() => {
-    if (!inView) return
-    if (reduceMotion) {
-      count.jump(value)
-    } else {
-      count.set(value)
-    }
-  }, [inView, value, count, reduceMotion])
-
-  return (
-    <div ref={ref}>
-      <div className="mv">
-        <motion.span>{rounded}</motion.span>
-      </div>
-      <div className="ml">{label}</div>
-    </div>
-  )
+const cardChild: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  },
 }
 
+const metricContainer: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.12, delayChildren: 0.25 } },
+}
+
+const metricChild: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut' },
+  },
+}
+
+const viewConfig = {
+  initial: 'hidden' as const,
+  whileInView: 'show' as const,
+  viewport: { once: true, margin: '-10%' },
+}
+
+const cardHover = {
+  y: -3,
+  transition: { type: 'spring' as const, stiffness: 400, damping: 22 },
+}
+const cardTap = { scale: 0.99 }
+
 function App() {
-  const reduceMotion = useReducedMotion()
-
-  // Product cards: stagger container + children
-  const cardChild: Variants = {
-    hidden: { opacity: 0, y: 16 },
-    show: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
-    },
-  }
-
-  // hover/tap — disabled if reduceMotion
-  const cardHover = reduceMotion
-    ? undefined
-    : { y: -3, transition: { type: 'spring' as const, stiffness: 400, damping: 22 } }
-  const cardTap = reduceMotion ? undefined : { scale: 0.99 }
-
   return (
     <>
       <div className="page">
@@ -88,30 +70,32 @@ function App() {
         >
           <h1>A small studio building focused tools for everyday life.</h1>
           <p>Each product solves one problem well. Nothing more, nothing less. Built in Tokyo with care.</p>
-          <div className="hero-metrics">
-            <CountMetric value={4} label="Products" />
-            <CountMetric value={3} label="Live" />
-            <CountMetric value={1} label="Engineer" />
-          </div>
+          <motion.div
+            className="hero-metrics"
+            initial="hidden"
+            animate="show"
+            variants={metricContainer}
+          >
+            <motion.div variants={metricChild}>
+              <div className="mv">4</div>
+              <div className="ml">Products</div>
+            </motion.div>
+            <motion.div variants={metricChild}>
+              <div className="mv">3</div>
+              <div className="ml">Live</div>
+            </motion.div>
+            <motion.div variants={metricChild}>
+              <div className="mv">1</div>
+              <div className="ml">Engineer</div>
+            </motion.div>
+          </motion.div>
         </motion.section>
 
         <section className="sec" style={{ borderTop: '1px solid var(--b)' }}>
-          <motion.div
-            className="sh"
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-10%' }}
-            variants={fadeUp}
-          >
+          <motion.div className="sh" {...viewConfig} variants={fadeUp}>
             Products
           </motion.div>
-          <motion.div
-            className="pgrid"
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-10%' }}
-            variants={gridContainer}
-          >
+          <motion.div className="pgrid" {...viewConfig} variants={gridContainer}>
             <motion.a
               href="https://kashite.kyren.app"
               className="card"
@@ -181,9 +165,7 @@ function App() {
         <motion.section
           className="sec"
           style={{ borderTop: '1px solid var(--b)' }}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, margin: '-10%' }}
+          {...viewConfig}
           variants={fadeUp}
         >
           <div className="about-grid">
