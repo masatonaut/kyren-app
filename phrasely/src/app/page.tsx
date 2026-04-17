@@ -775,12 +775,18 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8">
             <a
               href="/privacy"
-              className="hover:text-[var(--accent)] transition"
+              className="py-2 hover:text-[var(--accent)] transition"
             >
               Privacy
             </a>
             <a href="/terms" className="py-2 hover:text-[var(--accent)] transition">
               Terms
+            </a>
+            <a
+              href="/tokushoho"
+              className="py-2 hover:text-[var(--accent)] transition"
+            >
+              {"\u7279\u5546\u6CD5"}
             </a>
             <span className="order-first sm:order-none">
               {"\u00A9"} 2026{" "}
