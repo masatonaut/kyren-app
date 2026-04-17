@@ -14,12 +14,7 @@ interface FocusViewProps {
   onDone: () => void
   onQueueBack: () => void
   onActivate: (stripId: string) => void
-}
-
-const priorityBorderColor = {
-  urg: 'border-priority-urg',
-  nrm: 'border-priority-nrm',
-  low: 'border-priority-low',
+  onStripClick: (strip: Strip) => void
 }
 
 export default function FocusView({
@@ -31,25 +26,26 @@ export default function FocusView({
   onDone,
   onQueueBack,
   onActivate,
+  onStripClick,
 }: FocusViewProps) {
   if (!activeStrip) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-4">
-        <p className="text-text-tertiary text-lg">管制塔スタンバイ</p>
+        <p className="text-text-tertiary text-lg">Ready for takeoff</p>
         <p className="text-text-tertiary text-[13px]">
-          ↑↓ で QUEUE から選んで Enter で開始
+          Use <kbd className="px-1 py-0.5 bg-bg-secondary border border-border rounded text-[10px] font-mono">↑↓</kbd> to navigate ·{' '}
+          <kbd className="px-1 py-0.5 bg-bg-secondary border border-border rounded text-[10px] font-mono">⏎</kbd> to focus
         </p>
         {queueStrips.length > 0 && (
           <div className="mt-6 w-full max-w-md space-y-1">
             <p className="text-[11px] text-text-tertiary px-1 mb-2">QUEUE</p>
-            {queueStrips.slice(0, 5).map((strip, i) => (
-              <button
+            {queueStrips.slice(0, 5).map((strip) => (
+              <QueuePreviewRow
                 key={strip.id}
-                onClick={() => onActivate(strip.id)}
-                className="w-full text-left hover:bg-bg-tertiary rounded transition-colors"
-              >
-                <StripCard strip={strip} displayIndex={strip.position} compact />
-              </button>
+                strip={strip}
+                onFocus={() => onActivate(strip.id)}
+                onOpen={() => onStripClick(strip)}
+              />
             ))}
           </div>
         )}
@@ -79,9 +75,11 @@ export default function FocusView({
         {activeStrip.title}
       </h1>
 
-      {/* Category + Source */}
+      {/* Category + Source + Project */}
       <p className="text-[13px] text-text-secondary">
-        {activeStrip.category} · {activeStrip.source === 'vault' ? '🔗 Vault' : '✏️ Manual'}
+        {activeStrip.category}
+        {activeStrip.project && <> · <span className="text-accent font-medium">{activeStrip.project}</span></>}
+        {' · '}{activeStrip.source === 'vault' ? '🔗 Vault' : '✏️ Manual'}
       </p>
 
       {/* Timer */}
@@ -92,7 +90,7 @@ export default function FocusView({
         {formatTimer(timerSeconds)}
       </div>
 
-      {/* Action Buttons */}
+      {/* Actions */}
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleTimer}
@@ -105,6 +103,7 @@ export default function FocusView({
         >
           {isTimerRunning ? <Pause size={16} /> : <Play size={16} />}
           {isTimerRunning ? 'Pause' : 'Start'}
+          <kbd className="text-[10px] opacity-70 font-mono ml-1">s</kbd>
         </button>
 
         <button
@@ -113,6 +112,7 @@ export default function FocusView({
         >
           <CheckCircle2 size={16} />
           Done
+          <kbd className="text-[10px] opacity-70 font-mono ml-1">d</kbd>
         </button>
 
         <button
@@ -121,6 +121,7 @@ export default function FocusView({
         >
           <ArrowLeft size={16} />
           Queue
+          <kbd className="text-[10px] opacity-70 font-mono ml-1">q</kbd>
         </button>
       </div>
 
@@ -128,19 +129,42 @@ export default function FocusView({
       {queueStrips.length > 0 && (
         <div className="w-full mt-8 border-t border-border pt-4">
           <p className="text-[11px] text-text-tertiary mb-2 px-1">Next in Queue</p>
+          <p className="text-[10px] text-text-tertiary mb-2 px-1">Click to open · Hover and click Focus to start</p>
           <div className="space-y-1">
             {queueStrips.slice(0, 3).map((strip) => (
-              <button
+              <QueuePreviewRow
                 key={strip.id}
-                onClick={() => onActivate(strip.id)}
-                className="w-full text-left hover:bg-bg-tertiary rounded transition-colors"
-              >
-                <StripCard strip={strip} displayIndex={strip.position} compact />
-              </button>
+                strip={strip}
+                onFocus={() => onActivate(strip.id)}
+                onOpen={() => onStripClick(strip)}
+              />
             ))}
           </div>
         </div>
       )}
+    </div>
+  )
+}
+
+function QueuePreviewRow({ strip, onFocus, onOpen }: { strip: Strip; onFocus: () => void; onOpen: () => void }) {
+  return (
+    <div className="group relative flex items-center gap-1 hover:bg-bg-tertiary rounded transition-colors">
+      <button
+        onClick={onOpen}
+        className="flex-1 text-left min-w-0"
+        aria-label={`Open details for ${strip.title}`}
+      >
+        <StripCard strip={strip} displayIndex={strip.position} compact />
+      </button>
+      <button
+        onClick={onFocus}
+        className="shrink-0 px-2 py-1 mr-2 text-[11px] font-mono text-accent opacity-0 group-hover:opacity-100 transition-opacity border border-accent/30 rounded hover:bg-accent/10 flex items-center gap-1"
+        aria-label={`Focus ${strip.title}`}
+        title="Focus this strip"
+      >
+        <Play size={10} />
+        Focus
+      </button>
     </div>
   )
 }

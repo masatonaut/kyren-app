@@ -8,17 +8,17 @@ interface ShortcutHelpProps {
 }
 
 const shortcuts = [
-  { key: 'n', action: '新規ストリップ作成' },
-  { key: 's', action: 'タイマー START / PAUSE' },
-  { key: 'd', action: 'ACTIVE → CLEARED (Done)' },
-  { key: 'q', action: 'ACTIVE → QUEUE 戻し' },
-  { key: '↑↓', action: 'QUEUE 内選択' },
-  { key: 'Enter', action: '選択 → ACTIVE 化' },
-  { key: 'Esc', action: 'モーダル閉じ' },
-  { key: '1', action: 'Focus ビュー' },
-  { key: '2', action: 'Kanban ビュー' },
-  { key: 'p', action: 'プロジェクトフィルター切替' },
-  { key: '?', action: 'ショートカット一覧' },
+  { key: 'n', action: 'New strip' },
+  { key: 's', action: 'Timer start / pause' },
+  { key: 'd', action: 'Done (→ CLEARED)' },
+  { key: 'q', action: 'Back to queue' },
+  { key: '↑↓', action: 'Navigate queue' },
+  { key: 'Enter', action: 'Focus selected strip' },
+  { key: 'Esc', action: 'Close modal' },
+  { key: '1', action: 'Focus view' },
+  { key: '2', action: 'Kanban view' },
+  { key: 'p', action: 'Cycle project filter' },
+  { key: '?', action: 'Show shortcuts' },
 ]
 
 export default function ShortcutHelp({ isOpen, onClose }: ShortcutHelpProps) {

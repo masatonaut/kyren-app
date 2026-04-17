@@ -57,13 +57,13 @@ function createStrip(
 
 function getDemoStrips(): Strip[] {
   const demos: Array<{ title: string; priority: StripPriority; category: StripCategory; source: 'vault' | 'manual'; project: string | null }> = [
-    { title: 'KASHITE Resend API 設定', priority: 'urg', category: 'daily-top3', source: 'vault', project: 'KASHITE' },
-    { title: 'Upwork proposal 送信', priority: 'urg', category: 'daily-top3', source: 'vault', project: 'FREELANCE' },
-    { title: 'NeetCode DP問題 1問', priority: 'urg', category: 'daily-top3', source: 'vault', project: null },
-    { title: 'Phrasely Vercel deploy', priority: 'nrm', category: 'handoff', source: 'vault', project: 'PHRASELY' },
-    { title: 'Eagle Eye DIFF 適用', priority: 'nrm', category: 'handoff', source: 'vault', project: 'KYREN' },
-    { title: 'SABAKU project filter 実装', priority: 'nrm', category: 'manual', source: 'manual', project: 'SABAKU' },
-    { title: 'X 告知文ドラフト', priority: 'low', category: 'manual', source: 'manual', project: null },
+    { title: 'Review pull requests (KASHITE)', priority: 'urg', category: 'daily-top3', source: 'vault', project: 'KASHITE' },
+    { title: 'Send Upwork proposal', priority: 'urg', category: 'daily-top3', source: 'vault', project: 'FREELANCE' },
+    { title: 'NeetCode DP problem #42', priority: 'urg', category: 'daily-top3', source: 'vault', project: null },
+    { title: 'Deploy Phrasely to Vercel', priority: 'nrm', category: 'handoff', source: 'vault', project: 'PHRASELY' },
+    { title: 'Apply Eagle Eye diff', priority: 'nrm', category: 'handoff', source: 'vault', project: 'KYREN' },
+    { title: 'Ship SABAKU project filter', priority: 'nrm', category: 'manual', source: 'manual', project: 'SABAKU' },
+    { title: 'Draft launch tweet', priority: 'low', category: 'manual', source: 'manual', project: null },
   ]
   return demos.map(d => createStrip(d.title, d.priority, d.category, d.source, d.project))
 }
@@ -114,6 +114,16 @@ export function useStrips() {
     })
   }, [])
 
+  const editStrip = useCallback((stripId: string, updates: Partial<Pick<Strip, 'title' | 'priority' | 'project'>>) => {
+    setStrips(prev => prev.map(s =>
+      s.id === stripId ? { ...s, ...updates, updated_at: new Date().toISOString() } : s
+    ))
+  }, [])
+
+  const deleteStrip = useCallback((stripId: string) => {
+    setStrips(prev => prev.filter(s => s.id !== stripId))
+  }, [])
+
   const updateTimer = useCallback((stripId: string, seconds: number) => {
     setStrips(prev =>
       prev.map(s =>
@@ -141,6 +151,8 @@ export function useStrips() {
     projects,
     addStrip,
     moveStrip,
+    editStrip,
+    deleteStrip,
     updateTimer,
     reorderQueue,
   }

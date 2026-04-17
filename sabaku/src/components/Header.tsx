@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import type { ViewMode } from '@/types'
-import { Plus, Keyboard, ChevronDown } from 'lucide-react'
+import { Plus, Keyboard, ChevronDown, BarChart3, Download, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface HeaderProps {
@@ -10,60 +10,74 @@ interface HeaderProps {
   onViewChange: (mode: ViewMode) => void
   onNewStrip: () => void
   onShowHelp: () => void
+  onExport: () => void
+  onShowStats: () => void
   projects: string[]
   selectedProject: string | null
   onProjectChange: (project: string | null) => void
 }
 
-export default function Header({ viewMode, onViewChange, onNewStrip, onShowHelp, projects, selectedProject, onProjectChange }: HeaderProps) {
-  const [dropdownOpen, setDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
+export default function Header({
+  viewMode,
+  onViewChange,
+  onNewStrip,
+  onShowHelp,
+  onExport,
+  onShowStats,
+  projects,
+  selectedProject,
+  onProjectChange,
+}: HeaderProps) {
+  const [projectDropdown, setProjectDropdown] = useState(false)
+  const [settingsDropdown, setSettingsDropdown] = useState(false)
+  const projectRef = useRef<HTMLDivElement>(null)
+  const settingsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setDropdownOpen(false)
+      if (projectRef.current && !projectRef.current.contains(e.target as Node)) {
+        setProjectDropdown(false)
+      }
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsDropdown(false)
       }
     }
-    if (dropdownOpen) document.addEventListener('mousedown', handleClickOutside)
+    document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [dropdownOpen])
+  }, [])
 
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-bg-primary">
-      {/* Logo */}
-      <h1 className="text-[18px] font-bold tracking-tight font-sans">
-        SABAKU
-      </h1>
+      <h1 className="text-[18px] font-bold tracking-tight font-sans">SABAKU</h1>
 
-      {/* Center: View Tabs + Project Filter */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 bg-bg-secondary rounded p-0.5">
           <button
             onClick={() => onViewChange('focus')}
             className={cn(
-              'px-3 py-1 text-[13px] rounded transition-colors',
+              'flex items-center gap-1.5 px-3 py-1 text-[13px] rounded transition-colors',
               viewMode === 'focus' ? 'bg-bg-tertiary text-text-primary' : 'text-text-tertiary hover:text-text-secondary',
             )}
           >
             Focus
+            <kbd className="text-[10px] text-text-tertiary font-mono">1</kbd>
           </button>
           <button
             onClick={() => onViewChange('kanban')}
             className={cn(
-              'px-3 py-1 text-[13px] rounded transition-colors',
+              'flex items-center gap-1.5 px-3 py-1 text-[13px] rounded transition-colors',
               viewMode === 'kanban' ? 'bg-bg-tertiary text-text-primary' : 'text-text-tertiary hover:text-text-secondary',
             )}
           >
             Kanban
+            <kbd className="text-[10px] text-text-tertiary font-mono">2</kbd>
           </button>
         </div>
 
-        {/* Project Filter */}
         {projects.length > 0 && (
-          <div className="relative" ref={dropdownRef}>
+          <div className="relative" ref={projectRef}>
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
+              onClick={() => setProjectDropdown(!projectDropdown)}
               className={cn(
                 'flex items-center gap-1 px-2.5 py-1 text-[12px] rounded border transition-colors',
                 selectedProject
@@ -75,10 +89,10 @@ export default function Header({ viewMode, onViewChange, onNewStrip, onShowHelp,
               <ChevronDown size={12} />
             </button>
 
-            {dropdownOpen && (
+            {projectDropdown && (
               <div className="absolute top-full mt-1 left-0 bg-bg-secondary border border-border rounded shadow-lg z-40 min-w-[120px] py-1 animate-fade-in">
                 <button
-                  onClick={() => { onProjectChange(null); setDropdownOpen(false) }}
+                  onClick={() => { onProjectChange(null); setProjectDropdown(false) }}
                   className={cn(
                     'w-full text-left px-3 py-1.5 text-[12px] hover:bg-bg-tertiary transition-colors',
                     !selectedProject ? 'text-accent' : 'text-text-secondary',
@@ -89,7 +103,7 @@ export default function Header({ viewMode, onViewChange, onNewStrip, onShowHelp,
                 {projects.map(p => (
                   <button
                     key={p}
-                    onClick={() => { onProjectChange(p); setDropdownOpen(false) }}
+                    onClick={() => { onProjectChange(p); setProjectDropdown(false) }}
                     className={cn(
                       'w-full text-left px-3 py-1.5 text-[12px] hover:bg-bg-tertiary transition-colors',
                       selectedProject === p ? 'text-accent' : 'text-text-secondary',
@@ -104,8 +118,15 @@ export default function Header({ viewMode, onViewChange, onNewStrip, onShowHelp,
         )}
       </div>
 
-      {/* Right: Actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <button
+          onClick={onShowStats}
+          className="p-2 text-text-tertiary hover:text-text-secondary transition-colors"
+          title="Stats"
+          aria-label="Show stats"
+        >
+          <BarChart3 size={16} />
+        </button>
         <button
           onClick={onShowHelp}
           className="p-2 text-text-tertiary hover:text-text-secondary transition-colors"
@@ -114,13 +135,44 @@ export default function Header({ viewMode, onViewChange, onNewStrip, onShowHelp,
         >
           <Keyboard size={16} />
         </button>
+        <div className="relative" ref={settingsRef}>
+          <button
+            onClick={() => setSettingsDropdown(!settingsDropdown)}
+            className="p-2 text-text-tertiary hover:text-text-secondary transition-colors"
+            title="Settings"
+            aria-label="Settings menu"
+          >
+            <Settings size={16} />
+          </button>
+          {settingsDropdown && (
+            <div className="absolute top-full right-0 mt-1 bg-bg-secondary border border-border rounded shadow-lg z-40 min-w-[180px] py-1 animate-fade-in">
+              <button
+                onClick={() => { onExport(); setSettingsDropdown(false) }}
+                className="w-full text-left px-3 py-2 text-[12px] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors flex items-center gap-2"
+              >
+                <Download size={12} />
+                Export to JSON
+              </button>
+              <a
+                href="https://github.com/masatonaut/kyren-app/tree/main/sabaku"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setSettingsDropdown(false)}
+                className="w-full text-left px-3 py-2 text-[12px] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors block"
+              >
+                View on GitHub
+              </a>
+            </div>
+          )}
+        </div>
         <button
           onClick={onNewStrip}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-accent text-white rounded hover:bg-accent-hover transition-colors"
+          className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-accent text-white rounded hover:bg-accent-hover transition-colors ml-1"
           aria-label="Create new strip"
         >
           <Plus size={14} />
           New
+          <kbd className="text-[10px] opacity-70 font-mono">n</kbd>
         </button>
       </div>
     </header>

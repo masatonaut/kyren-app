@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
-import type { ViewMode } from '@/types'
+import { useState, useCallback, useMemo, useEffect } from 'react'
+import type { ViewMode, Strip } from '@/types'
 import { useStrips } from '@/hooks/useStrips'
 import { useTimer } from '@/hooks/useTimer'
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts'
@@ -11,26 +11,51 @@ import FocusView from '@/components/FocusView'
 import NewStripModal from '@/components/NewStripModal'
 import ShortcutHelp from '@/components/ShortcutHelp'
 import StatusBar from '@/components/StatusBar'
+import StripDetailModal from '@/components/StripDetailModal'
+import OnboardingModal from '@/components/OnboardingModal'
+import StatsPanel from '@/components/StatsPanel'
+
+const ONBOARDING_KEY = 'sabaku-onboarded'
 
 export default function Home() {
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
   const [newStripOpen, setNewStripOpen] = useState(false)
   const [helpOpen, setHelpOpen] = useState(false)
+  const [statsOpen, setStatsOpen] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
+  const [detailStrip, setDetailStrip] = useState<Strip | null>(null)
   const [selectedQueueIndex, setSelectedQueueIndex] = useState(0)
   const [selectedProject, setSelectedProject] = useState<string | null>(null)
 
   const {
+    strips,
     activeStrip,
     queueStrips,
     clearedStrips,
     projects,
     addStrip,
     moveStrip,
+    editStrip,
+    deleteStrip,
     updateTimer,
     reorderQueue,
   } = useStrips()
 
-  // Filter strips by project
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
+  }, [])
+
+  const handleFinishOnboarding = useCallback(() => {
+    if (typeof window !== 'undefined') localStorage.setItem(ONBOARDING_KEY, 'true')
+    setOnboardingOpen(false)
+  }, [])
+
+  const currentDetailStrip = useMemo(() => {
+    if (!detailStrip) return null
+    return strips.find(s => s.id === detailStrip.id) ?? null
+  }, [detailStrip, strips])
+
   const filteredQueue = useMemo(() =>
     selectedProject ? queueStrips.filter(s => s.project === selectedProject) : queueStrips,
     [queueStrips, selectedProject]
@@ -42,9 +67,7 @@ export default function Home() {
 
   const { seconds: timerSeconds, isRunning: isTimerRunning, toggle: toggleTimer, reset: resetTimer } = useTimer({
     initialSeconds: activeStrip?.timer_seconds ?? 0,
-    onTick: (s) => {
-      if (activeStrip) updateTimer(activeStrip.id, s)
-    },
+    onTick: (s) => { if (activeStrip) updateTimer(activeStrip.id, s) },
   })
 
   const handleDone = useCallback(() => {
@@ -75,9 +98,11 @@ export default function Home() {
   }, [filteredQueue.length])
 
   const handleClose = useCallback(() => {
-    if (helpOpen) setHelpOpen(false)
+    if (detailStrip) setDetailStrip(null)
+    else if (helpOpen) setHelpOpen(false)
     else if (newStripOpen) setNewStripOpen(false)
-  }, [helpOpen, newStripOpen])
+    else if (statsOpen) setStatsOpen(false)
+  }, [detailStrip, helpOpen, newStripOpen, statsOpen])
 
   const handleCycleProject = useCallback(() => {
     setSelectedQueueIndex(0)
@@ -87,6 +112,16 @@ export default function Home() {
       return idx < projects.length - 1 ? projects[idx + 1] : null
     })
   }, [projects])
+
+  const handleExport = useCallback(() => {
+    const blob = new Blob([JSON.stringify(strips, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `sabaku-strips-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [strips])
 
   const shortcutHandlers = useMemo(() => ({
     onNew: () => setNewStripOpen(true),
@@ -112,6 +147,8 @@ export default function Home() {
         onViewChange={setViewMode}
         onNewStrip={() => setNewStripOpen(true)}
         onShowHelp={() => setHelpOpen(true)}
+        onExport={handleExport}
+        onShowStats={() => setStatsOpen(true)}
         projects={projects}
         selectedProject={selectedProject}
         onProjectChange={(p) => { setSelectedProject(p); setSelectedQueueIndex(0) }}
@@ -125,6 +162,7 @@ export default function Home() {
             clearedStrips={filteredCleared}
             onMoveStrip={moveStrip}
             onReorderQueue={reorderQueue}
+            onStripClick={setDetailStrip}
             selectedQueueIndex={selectedQueueIndex}
           />
         ) : (
@@ -137,6 +175,7 @@ export default function Home() {
             onDone={handleDone}
             onQueueBack={handleQueueBack}
             onActivate={(id) => handleActivate(id)}
+            onStripClick={setDetailStrip}
           />
         )}
       </main>
@@ -155,10 +194,22 @@ export default function Home() {
         projects={projects}
       />
 
-      <ShortcutHelp
-        isOpen={helpOpen}
-        onClose={() => setHelpOpen(false)}
+      <ShortcutHelp isOpen={helpOpen} onClose={() => setHelpOpen(false)} />
+
+      <StripDetailModal
+        strip={currentDetailStrip}
+        projects={projects}
+        onClose={() => setDetailStrip(null)}
+        onEdit={editStrip}
+        onDelete={deleteStrip}
+        onFocus={(id) => { resetTimer(); moveStrip(id, 'active') }}
+        onDone={(id) => { resetTimer(); moveStrip(id, 'cleared') }}
+        onQueueBack={(id) => { resetTimer(); moveStrip(id, 'queue') }}
       />
+
+      <OnboardingModal isOpen={onboardingOpen} onClose={handleFinishOnboarding} />
+
+      <StatsPanel isOpen={statsOpen} onClose={() => setStatsOpen(false)} strips={strips} />
     </div>
   )
 }

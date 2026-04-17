@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SABAKU — Strip-based Task Control",
-  description: "Flight strip task management with Obsidian Vault sync. 捌く — clear your tasks one by one.",
+  description: "Flight strip task management with Obsidian Vault sync. Clear your tasks one by one.",
   metadataBase: new URL("https://sabaku.kyren.app"),
   openGraph: {
     title: "SABAKU — Strip-based Task Control",
@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="ja"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
     >
       <body className="min-h-full flex flex-col bg-bg-primary text-text-primary">
