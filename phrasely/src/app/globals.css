@@ -23,3 +23,18 @@ body {
   background-color: var(--background);
   color: var(--foreground);
 }
+
+/* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+@media (min-width: 640px) {
+  input,
+  textarea,
+  select {
+    font-size: 14px;
+  }
+}

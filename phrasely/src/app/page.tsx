@@ -556,6 +556,30 @@ export default function Home() {
           <p className="mt-4 text-[var(--error)] text-center">{error}</p>
         )}
 
+        {/* Empty state */}
+        {!loading && !result && !error && !inputText && (
+          <div className="mt-6 p-6 rounded-lg bg-[var(--card)]/50 border border-dashed border-[var(--border)] text-center">
+            <p className="text-sm text-[var(--muted)] mb-2">
+              {"\u{1F4DD}"} Try one of these to get started:
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mt-3">
+              {[
+                "i want to say thanks for your help",
+                "メールで会議の予定を立てたい",
+                "this idea is good but i have some concern",
+              ].map((sample) => (
+                <button
+                  key={sample}
+                  onClick={() => setInputText(sample)}
+                  className="px-3 py-1.5 text-xs rounded-full bg-[var(--background)] border border-[var(--border)] text-[var(--muted)] hover:text-[var(--foreground)] hover:border-[var(--accent)] transition cursor-pointer"
+                >
+                  {sample.length > 30 ? sample.slice(0, 28) + "…" : sample}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Loading skeleton */}
         {loading && (
           <div className="mt-6 space-y-4">
