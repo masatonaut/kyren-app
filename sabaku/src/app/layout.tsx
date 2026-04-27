@@ -23,6 +23,13 @@ export const metadata: Metadata = {
     siteName: "SABAKU",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "SABAKU — Strip-based Task Control",
+    description: "Flight strip task management with Obsidian Vault sync.",
+    site: "@masatobuilds",
+  },
+  robots: { index: true, follow: true },
 }
 
 export const viewport: Viewport = {
