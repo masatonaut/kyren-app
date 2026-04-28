@@ -22,12 +22,14 @@ export const metadata: Metadata = {
     url: "https://sabaku.kyren.app",
     siteName: "SABAKU",
     type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "SABAKU — ATC-inspired task management" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "SABAKU — Strip-based Task Control",
     description: "Flight strip task management with Obsidian Vault sync.",
     site: "@masatobuilds",
+    images: ["/og.png"],
   },
   robots: { index: true, follow: true },
 }

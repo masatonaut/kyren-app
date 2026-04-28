@@ -15,12 +15,14 @@ export const metadata: Metadata = {
     url: "https://phrasely.kyren.app",
     siteName: "Phrasely",
     locale: "en_US",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Phrasely — Sound native, effortlessly" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Phrasely — Sound native, effortlessly",
     description: "AI-powered English rewriting for Japanese speakers.",
     site: "@masatobuilds",
+    images: ["/og.png"],
   },
   robots: { index: true, follow: true },
 };
