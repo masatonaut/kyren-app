@@ -1,4 +1,28 @@
-# SABAKU — Flight Strip Task Management
+<div align="center">
+  <img src="public/og.png" alt="SABAKU — ATC-inspired task management" width="100%" />
+
+  <h1>SABAKU</h1>
+
+  <p><strong>Flight strip task management. Visual, spatial, decisive.</strong></p>
+
+  <p>
+    <a href="https://sabaku.kyren.app">Live demo</a>
+    &nbsp;·&nbsp;
+    <a href="https://kyren.app">Kyren</a>
+    &nbsp;·&nbsp;
+    <a href="https://x.com/masatobuilds">@masatobuilds</a>
+  </p>
+
+  <p>
+    <img src="https://img.shields.io/badge/Next.js-16-black?logo=nextdotjs" />
+    <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" />
+    <img src="https://img.shields.io/badge/Supabase-RLS-3ECF8E?logo=supabase" />
+    <img src="https://img.shields.io/badge/Obsidian-sync-7C3AED?logo=obsidian" />
+    <img src="https://img.shields.io/badge/license-MIT-blue" />
+  </p>
+</div>
+
+---
 
 > One task at a time. Keyboard-first. Obsidian-native. For deep work.
 
