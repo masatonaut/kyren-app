@@ -1,9 +1,12 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import type { ViewMode } from '@/types'
-import { Plus, Keyboard, ChevronDown, BarChart3, Download, Settings } from 'lucide-react'
+import { Plus, Keyboard, ChevronDown, BarChart3, Download, Settings, User as UserIcon, LogOut, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/hooks/useAuth'
+import { useSubscription } from '@/hooks/useSubscription'
 
 interface HeaderProps {
   viewMode: ViewMode
@@ -30,17 +33,19 @@ export default function Header({
 }: HeaderProps) {
   const [projectDropdown, setProjectDropdown] = useState(false)
   const [settingsDropdown, setSettingsDropdown] = useState(false)
+  const [userDropdown, setUserDropdown] = useState(false)
   const projectRef = useRef<HTMLDivElement>(null)
   const settingsRef = useRef<HTMLDivElement>(null)
+  const userRef = useRef<HTMLDivElement>(null)
+
+  const { user, isConfigured: authConfigured, signOut } = useAuth()
+  const { isPro } = useSubscription(user)
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (projectRef.current && !projectRef.current.contains(e.target as Node)) {
-        setProjectDropdown(false)
-      }
-      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
-        setSettingsDropdown(false)
-      }
+      if (projectRef.current && !projectRef.current.contains(e.target as Node)) setProjectDropdown(false)
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) setSettingsDropdown(false)
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserDropdown(false)
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
@@ -48,7 +53,15 @@ export default function Header({
 
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-bg-primary">
-      <h1 className="text-[18px] font-bold tracking-tight font-sans">SABAKU</h1>
+      <div className="flex items-center gap-2">
+        <h1 className="text-[18px] font-bold tracking-tight font-sans">SABAKU</h1>
+        {isPro && (
+          <span className="flex items-center gap-1 px-1.5 py-0.5 text-[10px] font-mono uppercase tracking-wider bg-accent/10 text-accent border border-accent/30 rounded">
+            <Sparkles size={10} />
+            Pro
+          </span>
+        )}
+      </div>
 
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-1 bg-bg-secondary rounded p-0.5">
@@ -135,6 +148,7 @@ export default function Header({
         >
           <Keyboard size={16} />
         </button>
+
         <div className="relative" ref={settingsRef}>
           <button
             onClick={() => setSettingsDropdown(!settingsDropdown)}
@@ -153,6 +167,13 @@ export default function Header({
                 <Download size={12} />
                 Export to JSON
               </button>
+              <Link
+                href="/pricing"
+                onClick={() => setSettingsDropdown(false)}
+                className="w-full text-left px-3 py-2 text-[12px] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors block"
+              >
+                Pricing
+              </Link>
               <a
                 href="https://github.com/masatonaut/kyren-app/tree/main/sabaku"
                 target="_blank"
@@ -160,11 +181,69 @@ export default function Header({
                 onClick={() => setSettingsDropdown(false)}
                 className="w-full text-left px-3 py-2 text-[12px] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors block"
               >
-                View on GitHub
+                GitHub
               </a>
             </div>
           )}
         </div>
+
+        {/* User menu */}
+        {authConfigured && (
+          <div className="relative" ref={userRef}>
+            {user ? (
+              <>
+                <button
+                  onClick={() => setUserDropdown(!userDropdown)}
+                  className="p-2 text-text-tertiary hover:text-text-secondary transition-colors"
+                  title={user.email ?? 'Account'}
+                  aria-label="Account menu"
+                >
+                  <UserIcon size={16} />
+                </button>
+                {userDropdown && (
+                  <div className="absolute top-full right-0 mt-1 bg-bg-secondary border border-border rounded shadow-lg z-40 min-w-[200px] py-1 animate-fade-in">
+                    <div className="px-3 py-2 border-b border-border">
+                      <p className="text-[11px] text-text-tertiary truncate">Signed in as</p>
+                      <p className="text-[12px] text-text-primary truncate">{user.email}</p>
+                    </div>
+                    {!isPro && (
+                      <Link
+                        href="/pricing"
+                        onClick={() => setUserDropdown(false)}
+                        className="w-full text-left px-3 py-2 text-[12px] text-accent hover:bg-bg-tertiary transition-colors flex items-center gap-2"
+                      >
+                        <Sparkles size={12} />
+                        Upgrade to Pro
+                      </Link>
+                    )}
+                    <Link
+                      href="/activate"
+                      onClick={() => setUserDropdown(false)}
+                      className="w-full text-left px-3 py-2 text-[12px] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors block"
+                    >
+                      Activate license
+                    </Link>
+                    <button
+                      onClick={() => { void signOut(); setUserDropdown(false) }}
+                      className="w-full text-left px-3 py-2 text-[12px] text-text-secondary hover:text-text-primary hover:bg-bg-tertiary transition-colors flex items-center gap-2"
+                    >
+                      <LogOut size={12} />
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              <Link
+                href="/login"
+                className="px-2.5 py-1 text-[12px] text-text-secondary hover:text-text-primary border border-border rounded transition-colors"
+              >
+                Sign in
+              </Link>
+            )}
+          </div>
+        )}
+
         <button
           onClick={onNewStrip}
           className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] bg-accent text-white rounded hover:bg-accent-hover transition-colors ml-1"
